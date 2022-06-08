@@ -20,6 +20,20 @@ A logic-based puzzle game that makes the players hate the game. Lack of proper i
     - Minor Change
 - Keep commit to their respective branch (i.e. `Patch - Increased player jumping height` should not be commited to `level1` branch. It should go to `AssetMovement` branch instead.)
 
-## Pushing
+### Pushing
 - Pushing to master is forbidden, branches would be merged later
 - To be accepted for a merge to master, code should either pass unittest (if applicable) or be checked for bugs by at least one other developer
+
+### Graphic Details
+- The screen has a width of 16 unit and height of 9 unit. In that case, you can consider the screen a set of 16x9 `block`s (This will help you organize game graphics more easily. For example, the ceiling is basically top row having 16 blocks).
+
+### Setting-up
+- Have GHC 8.10.7 or 8.8.4 installed with Cabal. Better if you have GHCUP installed.
+- Clone this repository
+- Run `cabal v2-run --disable-tests`. If everything goes fine, you will see a blue screen with a black circle.
+
+### Code
+- Work on existing files
+- Make sure to not break other peoples code
+- Write doctests if possible
+- Follow the Haskell assignments code style
