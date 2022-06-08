@@ -25,7 +25,8 @@ A logic-based puzzle game that makes the players hate the game. Lack of proper i
 - To be accepted for a merge to master, code should either pass unittest (if applicable) or be checked for bugs by at least one other developer
 
 ### Graphic Details
-- The screen has a width of 16 unit and height of 9 unit. In that case, you can consider the screen a set of 16x9 `block`s (This will help you organize game graphics more easily. For example, the ceiling is basically top row having 16 blocks).
+- Screen size is 1600px * 900px
+- Consider the screen 16 unit x 9 unit. In that case, it is a set of 16x9 `block`s (This will help you organize game graphics more easily. For example, the ceiling is basically top row having 16 blocks. Or maybe, the next level portal is at row 6, col 15).
 
 ### Setting-up
 - Have GHC 8.10.7 or 8.8.4 installed with Cabal. Better if you have GHCUP installed.
