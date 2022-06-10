@@ -83,3 +83,38 @@ cage theme = pictures [
 
 rollingStone :: Theme -> Picture
 rollingStone theme = color (getForegroundColor theme) (thickCircle 42.5 15)
+
+-- Picture of a balloon for pptx704
+balloon :: Picture 
+balloon = pictures [circle, wire]
+    where 
+        circle = translate 0 60 (circleSolid 30)
+        wire = rectangleSolid 2 100
+
+-- A button container for the control boxes 
+buttonBox :: Picture 
+buttonBox = rectangleWire 25 25
+
+-- An exit button 
+exitButton :: Picture 
+exitButton = pictures [box, exitIcon]
+    where 
+        box = translate 3 0 buttonBox
+        line1 = rotate (45) (rectangleSolid 3 20)
+        line2 = rotate (-45) (rectangleSolid 3 20)
+        exitIcon = translate 3 (-0.5) (pictures [line1, line2])
+
+-- A pause button 
+pauseButton :: Picture 
+pauseButton = pictures [box, pauseIcon]
+    where 
+        box = translate 3 0 buttonBox 
+        line = rectangleSolid 3 20
+        pauseIcon = translate 0.1 0 (pictures [line, translate 5 0 line])
+
+-- change theme controller 
+changeThemeButton :: Picture 
+changeThemeButton = pictures [box, circle]
+    where 
+        box = translate 3 0 buttonBox 
+        circle = translate 3 0 (circleSolid 7)
