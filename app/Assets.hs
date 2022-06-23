@@ -49,20 +49,20 @@ portal = portal' [4, 16 .. 40] yellow
 
 -- Player is a static image for now. 
 -- Maybe it will animate in the final submission
-playerSprite :: Picture
-playerSprite = pictures [head, body, hands, legs]
+playerSprite :: Theme -> Picture
+playerSprite theme = pictures [head, body, hands, legs]
     where
-        head = translate 0 120 (circleSolid 17.5)
-        body = translate 0 60 (rectangleSolid 8 85)
+        fgcolor = getForegroundColor theme
+        head = translate 0 120 (color fgcolor (circleSolid 17.5))
+        body = translate 0 60 (color fgcolor (rectangleSolid 8 85))
         hands = translate 0 60 (leftHand <> rightHand)
         legs = translate 0 (-15) (leftLeg <> rightLeg)
-        hand' = rectangleSolid 5 80
+        hand' = color fgcolor (rectangleSolid 5 80)
         leftHand = translate (-10) 0 (rotate 15 hand')
         rightHand = translate 10 0 (rotate (-15) hand')
-        leg' = rectangleSolid 5 70
+        leg' = color fgcolor (rectangleSolid 5 70)
         leftLeg = translate (-5) 0 (rotate 5 leg')
         rightLeg = translate 5 0 (rotate (-5) leg')
-
 
 -- Cage for pptx704's balloon lvl
 cage :: Theme -> Picture
