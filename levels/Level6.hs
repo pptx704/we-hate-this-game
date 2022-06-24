@@ -62,8 +62,9 @@ wallBlock theme = pictures [jumpingBlock theme, texture]
 
 type Stone = (Int, Int, Char)
 data State = State [Stone] Bool -- list of rolling stones, 
--- and a bool (False - if the game has ended)
+-- and a bool (True - if the game has ended)
 
+-- renders a Stone with a given theme (Dark | Light)
 renderStone :: Theme -> Stone -> Picture 
 renderStone theme (x, y, char) = stonePicture <> characterPicture 
     where 
@@ -80,6 +81,7 @@ generateWorld :: String -> Int -> [Stone]
 generateWorld []       dx = []
 generateWorld (n : ns) dx = (dx, 0, n) : (generateWorld ns (dx + 150))   
 
+-- renders a list of stones 
 renderStones :: [Stone] -> Picture 
 renderStones []       = blank
 renderStones (n : ns) = pictures [renderStone DarkTheme n, 
@@ -121,9 +123,11 @@ handleWorld (EventKey (Char char) _ _ _)
 
 handleWorld _ state = state
 
+-- decreaseStone rolls the stones to the left 
 decreaseStone :: Stone -> Stone 
 decreaseStone (x, y, char) = (x - 100, y, char)
 
+-- checks if the stone touches the player sprite 
 touchesPlayer :: [Stone] -> Bool 
 touchesPlayer ((x, y, firstCharacter) : remStones) = (x <= -490)
 touchesPlayer _ = True
