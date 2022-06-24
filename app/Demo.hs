@@ -4,8 +4,6 @@ import Graphics.Gloss
 import Assets
 import WeHateThisGame
 
-window :: Display
-window = InWindow "Random window" (1600, 900) (100, 100)
 
 runner' theme = display window (getBackgroundColor theme) (pictures [
     wallBlock theme, translate 100 0 (jumpingBlock theme <> portal),
