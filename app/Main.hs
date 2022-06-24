@@ -1,5 +1,5 @@
 module Main where
-import Demo
+import Level6 (game)
 
 main :: IO ()
-main = runner
+main = game

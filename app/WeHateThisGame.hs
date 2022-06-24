@@ -6,3 +6,5 @@ data Block = WallBlock | PlainBlock
 -- There are two themes, dark and light
 -- Dark themes have grey foreground and white background, vice versa for light
 data Theme = DarkTheme | LightTheme
+
+newtype NumberedState = NumberedState Int
