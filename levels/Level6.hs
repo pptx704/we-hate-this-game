@@ -62,7 +62,7 @@ wallBlock theme = pictures [jumpingBlock theme, texture]
 
 type Stone = (Int, Int, Char)
 data State = State [Stone] Bool -- list of rolling stones, 
--- and a bool (True - if the game has ended)
+-- and a bool (True - if the user has lost)
 
 -- renders a Stone with a given theme (Dark | Light)
 renderStone :: Theme -> Stone -> Picture 
