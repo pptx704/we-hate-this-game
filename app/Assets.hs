@@ -15,15 +15,15 @@ getBackgroundColor DarkTheme = light (light black)
 -- have some texture
 jumpingBlock :: Theme -> Picture
 jumpingBlock theme = pictures [
-        color (getBackgroundColor theme) (rectangleSolid 100 100),
-        color (getForegroundColor theme) (rectangleSolid 98 98)
+        color (getForegroundColor theme) (rectangleSolid 100 100),
+        color (getBackgroundColor theme) (rectangleSolid 98 98)
     ]
 
 -- Wallblocks are jumpingblocks with texture.
 wallBlock :: Theme -> Picture
 wallBlock theme = pictures [jumpingBlock theme, texture]
     where
-        line= color (getBackgroundColor theme) (rectangleSolid 20 5)
+        line= color (getForegroundColor theme) (rectangleSolid 20 5)
         threeLine = pictures [
             line,
             translate 30 0 line,
@@ -44,11 +44,32 @@ numberedBlock :: Theme ->  Int -> Picture
 numberedBlock t a 
     = jumpingBlock t <> color fgcolor (translate (-20) (-20) (scale 0.5 0.5 (Text (show a))))
     where
-        fgcolor = getBackgroundColor t
+        fgcolor = getForegroundColor t
 
+
+type Stone = (Int, Int, Char)
+
+-- renders a Stone with a given theme (Dark | Light)
+renderStone :: Theme -> Stone -> Picture
+renderStone theme (x, y, char) = stonePicture <> characterPicture
+    where
+        fgcolor = getForegroundColor theme
+        x' = fromIntegral x
+        y' = fromIntegral y
+        stonePicture = translate (x' + 25.0) (y' + 20.0)
+                (rollingStone theme)
+        characterPicture = translate x' y'
+                (color fgcolor (scale 0.5 0.5 (Text [char])))
+
+-- renders a list of stones 
+renderStones :: Theme -> [Stone] -> Picture
+renderStones _ []       = blank
+renderStones theme (n : ns) = pictures [renderStone theme n,
+                                    renderStones theme ns]
 
 -- 
 drawBlock :: Theme -> Block -> Picture
+drawBlock _ Empty = blank
 drawBlock t WallBlock = wallBlock t
 drawBlock t JumpingBlock = jumpingBlock t
 drawBlock t (NumberedBlock a) = numberedBlock t a
@@ -114,7 +135,7 @@ exitButton :: Picture
 exitButton = pictures [box, exitIcon]
     where 
         box = translate 3 0 buttonBox
-        line1 = rotate (45) (rectangleSolid 3 20)
+        line1 = rotate 45 (rectangleSolid 3 20)
         line2 = rotate (-45) (rectangleSolid 3 20)
         exitIcon = translate 3 (-0.5) (pictures [line1, line2])
 

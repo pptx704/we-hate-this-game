@@ -3,7 +3,8 @@ import Graphics.Gloss
 
 -- WallBlock are for walls and PlainBlock is for jumping
 data Block = 
-    JumpingBlock 
+    Empty
+    | JumpingBlock 
     | WallBlock 
     | NumberedBlock Int
 

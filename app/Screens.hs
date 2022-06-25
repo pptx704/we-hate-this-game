@@ -20,11 +20,20 @@ drawRows t [] = blank
 getBackground :: Theme -> [[Block]] -> Picture
 getBackground t bg = translate (-750) 400 (drawRows t bg)
 
-lv8 :: [[Block]]
-lv8 = [allBlock WallBlock 16] ++ map (turnTo borders) [1 .. 6] ++ [numbered] ++ [allBlock WallBlock 16]
-    where
-        allBlock block n = map (turnTo block) [1 .. n]
-        numbered = [WallBlock] ++ map getNumbered [1..14] ++ [WallBlock]
-        borders = [WallBlock] ++ allBlock JumpingBlock 14 ++ [WallBlock]
-        turnTo item _ = item
-        getNumbered item = NumberedBlock (item `mod` 10)
+-- helpers for level mapping
+
+-- makes N number of blocks of same type
+allBlock :: Block -> Int -> [Block]
+allBlock block n = map (const block) [1 .. n]
+
+-- Make a bordered row where leftmost and rightmost are wall and rest are empty
+borders :: [Block]
+borders = [WallBlock] ++ allBlock Empty 14 ++ [WallBlock]
+
+-- Map for level 6
+lv6 :: [[Block]]
+lv6 =
+    [allBlock WallBlock 16] ++
+    map (const borders) [1..4] ++
+    map (\x -> allBlock Empty 16) [0, 1] ++
+    map (\x -> allBlock WallBlock 16) [0, 1]

@@ -2,8 +2,9 @@ module Main where
 import Level6 (game)
 import Assets (getBackgroundColor)
 import Graphics.Gloss (display)
-import Screens (lv8, getBackground, window)
-import WeHateThisGame (Theme(LightTheme), Block (WallBlock, JumpingBlock, NumberedBlock))
+import Screens (getBackground, window, lv6)
+import WeHateThisGame (Theme (LightTheme, DarkTheme), Block)
 
 main :: IO ()
-main = display window (getBackgroundColor LightTheme) (getBackground LightTheme lv8)
+main = game DarkTheme
+--main = display window (getBackgroundColor LightTheme) (getBackground LightTheme lv6)
