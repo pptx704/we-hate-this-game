@@ -94,7 +94,7 @@ updateWorld step (State stones losingState) = newState
 
 game :: IO ()
 game = play window (getBackgroundColor DarkTheme) 1
-          (State ((generateWorld ("youhavetotypeme") 0)) False)
+          (State (generateWorld "youhavetotypeme" 0) False)
        drawWorld handleWorld updateWorld
 -- you have to render the stones from a string 
 -- the world is a string 

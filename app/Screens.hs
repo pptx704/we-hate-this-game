@@ -18,10 +18,10 @@ drawRows t (row: rows) =
 drawRows t [] = blank
 
 getBackground :: Theme -> [[Block]] -> Picture
-getBackground t bg = translate (-800) 450 (drawRows t bg)
+getBackground t bg = translate (-750) 400 (drawRows t bg)
 
 lv8 :: [[Block]]
-lv8 = [allBlock WallBlock 16] ++ map (turnTo borders) [0 .. 6] ++ [numbered] ++ [allBlock WallBlock 16]
+lv8 = [allBlock WallBlock 16] ++ map (turnTo borders) [1 .. 6] ++ [numbered] ++ [allBlock WallBlock 16]
     where
         allBlock block n = map (turnTo block) [1 .. n]
         numbered = [WallBlock] ++ map getNumbered [1..14] ++ [WallBlock]
