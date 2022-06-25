@@ -2,9 +2,6 @@ module Assets where
 import WeHateThisGame
 import Graphics.Gloss
 
-window :: Display
-window = InWindow "Random window" (1600, 900) (100, 100)
-
 -- getZOrderColor functions are for adjusting themes
 getForegroundColor :: Theme -> Color
 getForegroundColor LightTheme = light black
@@ -42,11 +39,19 @@ wallBlock theme = pictures [jumpingBlock theme, texture]
             translate 0 (-30) twoLine
             ]
 
-numberedBlock :: Theme ->  NumberedState -> Picture
-numberedBlock t (NumberedState a) 
-    = color fgcolor (Text (show a)) <> jumpingBlock t
+-- Numbered blocks are jumping blocks but with a number on them
+numberedBlock :: Theme ->  Int -> Picture
+numberedBlock t a 
+    = jumpingBlock t <> color fgcolor (translate (-20) (-20) (scale 0.5 0.5 (Text (show a))))
     where
-        fgcolor = getForegroundColor t
+        fgcolor = getBackgroundColor t
+
+
+-- 
+drawBlock :: Theme -> Block -> Picture
+drawBlock t WallBlock = wallBlock t
+drawBlock t JumpingBlock = jumpingBlock t
+drawBlock t (NumberedBlock a) = numberedBlock t a
 
 -- Portal is a circle with yellow gradient. It doesn't depend on theme
 portal :: Picture

@@ -5,6 +5,7 @@ module Level6 where
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 import Assets
+import Screens
 import WeHateThisGame
 
 -- make the theme global later, somehow?
