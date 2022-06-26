@@ -6,7 +6,7 @@ data Block =
     | JumpingBlock 
     | WallBlock 
     | NumberedBlock Int
-
+    deriving Show
 -- There are two themes, dark and light
 -- Dark themes have grey foreground and white background, vice versa for light
 data Theme = 
@@ -14,5 +14,7 @@ data Theme =
     | LightTheme
     
 type Player = (Float, Float)
+
+data Movement = ToUp | ToLeft | ToRight
 
 data State a = State Theme [[Block]] Player a Bool
