@@ -35,5 +35,6 @@ executable we-hate-this-game
     -- other-extensions:
     build-depends:    base ==4.14.3.0 || ==4.13.0.0
                     , gloss == 1.13.*
+                    , random == 1.2.*
     hs-source-dirs:   app
     default-language: Haskell2010

@@ -4,9 +4,11 @@ import Graphics.Gloss
 import Assets
 import WeHateThisGame
 
+-- | Game window 1600 x 900
 window :: Display
 window = InWindow "Random window" (1600, 900) (100, 100)
 
+-- | The next two functions draw a grid to game map
 drawColumn :: Theme -> [Block] -> Picture
 drawColumn t (col:cols) =
     drawBlock t col <> translate 100 0 (drawColumn t cols)
@@ -17,6 +19,7 @@ drawRows t (row: rows) =
     drawColumn t row <> translate 0 (-100) (drawRows t rows)
 drawRows _ [] = blank
 
+-- | This function is just to get away with the OpenGL `translate` stack limit
 getBackground :: Theme -> [[Block]] -> Picture
 getBackground = drawRows
 

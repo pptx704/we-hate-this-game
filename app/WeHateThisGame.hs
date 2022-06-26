@@ -1,20 +1,25 @@
 module WeHateThisGame where
 
--- WallBlock are for walls and PlainBlock is for jumping
+-- | Blocks are to make game map
 data Block = 
     Empty
     | JumpingBlock 
     | WallBlock 
     | NumberedBlock Int
     deriving Show
--- There are two themes, dark and light
+
+-- | There are two themes, dark and light
 -- Dark themes have grey foreground and white background, vice versa for light
 data Theme = 
     DarkTheme 
     | LightTheme
-    
+
+-- | Player coordinate
 type Player = (Float, Float)
 
+-- | Movement type, will be used for improving collisions 
+-- and to implement gravity
 data Movement = ToUp | ToLeft | ToRight
 
+-- | Generalized game state
 data State a = State Theme [[Block]] Player a Bool

@@ -26,15 +26,17 @@ getCellType (x, 0) (g:_) = getCellAtCol x g
 getCellType (x, y) (_:gs) = getCellType (x, y - 1) gs
 getCellType _ [] = Empty
 
+-- | changeCell and getCell can be merged or something??
 
 -- | Converts a coordinate to the cell inside the grid syste
 -- >>> getCellPos (200, -600)
 -- NOW (2,6)
-
-
 getCellPos :: Player -> (Int, Int)
 getCellPos (x, y) = (div' x 100, abs $ div' y 100)
 
+
+-- | Generalized movement function. Checks if a the new grid position of the
+-- player is a block or empty. If empty then player moves, else not.
 applyMovement :: SpecialKey -> State a -> State a
 applyMovement k (State theme grid (x, y) stones losingState)
     = case k of
@@ -43,7 +45,7 @@ applyMovement k (State theme grid (x, y) stones losingState)
         -- the following 3 are for testing purpose. Will be removed
         -- KeyUp -> State theme grid (newPos (x,y) (x, y+30)) stones losingState
         -- KeyDown -> State theme grid (newPos (x,y) (x, y-30)) stones losingState
-        -- KeySpace -> State theme (changeCell (getCellPos (x, y)) (const JumpingBlock) grid) (x, y) stones losingState
+        KeySpace -> State theme (changeCell (getCellPos (x, y)) (const $ NumberedBlock 5) grid) (x, y) stones losingState
         _ -> State theme grid (x, y) stones losingState
         where
             newPos a b = case getCellType (getCellPos b) grid of

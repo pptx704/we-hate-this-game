@@ -97,8 +97,9 @@ cage theme = pictures [
         bars' n = rectangleSolid 5 98
             <> translate 25 0 (bars' (n-1))
 
+-- | Stones for lv 6. Some other level will also use it.
 rollingStone :: Theme -> Picture
-rollingStone theme = color (getForegroundColor theme) (thickCircle 42.5 15)
+rollingStone theme = color (getForegroundColor theme) (thickCircle 42.5 10)
 
 -- Picture of a balloon for pptx704
 balloon :: Picture 
