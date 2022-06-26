@@ -34,6 +34,6 @@ borders = [WallBlock] ++ allBlock Empty 14 ++ [WallBlock]
 lv6 :: [[Block]]
 lv6 =
     [allBlock WallBlock 16] ++
-    map (const borders) [1..6] ++
-    -- map (\_ -> allBlock Empty 16) [0, 1] ++
+    map (const borders) [1..4] ++
+    map (\_ ->  WallBlock : allBlock Empty 15) [0, 1] ++
     map (\_ -> allBlock WallBlock 16) [0, 1]

@@ -23,7 +23,9 @@ renderStone theme (x, y, rot, char)
         fgcolor = getForegroundColor theme
         stonePicture = 
             translate x y $ rotate rot $ rollingStone theme
-        characterPicture = translate x y $ rotate rot $ scale 0.3 0.3 (color fgcolor (Text [char]))
+        characterPicture = 
+            translate x y $ rotate rot 
+            $ scale 0.3 0.3 (color fgcolor (Text [char]))
 
 -- renders a list of stones 
 renderStones :: Theme -> [Stone] -> Picture
@@ -88,12 +90,12 @@ updateWorld t (State theme grid player stones losingState) = newState
             State theme grid player [] True else
             State theme grid player newStonesLoc losingState
 
-game :: Theme -> IO ()
 
 -- make the theme global later, somehow?
 -- data State [Stone] = State Theme [[Block]] Player [Stone] Bool -- list of rolling stones, 
 -- and a bool (True - if the user has lost)
-game theme = play window (getBackgroundColor theme) 120
+game6 :: Theme -> IO ()
+game6 theme = play window (getBackgroundColor theme) 120
         (State theme lv6 (200, -600) (generateWorld "youhavetotypeme" 700) False)
         drawWorld handleWorld updateWorld
 
