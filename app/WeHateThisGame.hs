@@ -1,5 +1,4 @@
 module WeHateThisGame where
-import Graphics.Gloss
 
 -- WallBlock are for walls and PlainBlock is for jumping
 data Block = 
@@ -13,3 +12,7 @@ data Block =
 data Theme = 
     DarkTheme 
     | LightTheme
+    
+type Player = (Float, Float)
+
+data State a = State Theme [[Block]] Player a Bool

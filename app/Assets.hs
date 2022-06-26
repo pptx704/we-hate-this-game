@@ -23,15 +23,15 @@ jumpingBlock theme = pictures [
 wallBlock :: Theme -> Picture
 wallBlock theme = pictures [jumpingBlock theme, texture]
     where
-        line= color (getForegroundColor theme) (rectangleSolid 20 5)
+        line_ = color (getForegroundColor theme) (rectangleSolid 20 5)
         threeLine = pictures [
-            line,
-            translate 30 0 line,
-            translate (-30) 0 line
+            line_,
+            translate 30 0 line_,
+            translate (-30) 0 line_
             ]
         twoLine = pictures [
-            translate 15 0 line,
-            translate (-15) 0 line
+            translate 15 0 line_,
+            translate (-15) 0 line_
             ]
         texture = pictures [
             threeLine, 
@@ -45,27 +45,6 @@ numberedBlock t a
     = jumpingBlock t <> color fgcolor (translate (-20) (-20) (scale 0.5 0.5 (Text (show a))))
     where
         fgcolor = getForegroundColor t
-
-
-type Stone = (Int, Int, Char)
-
--- renders a Stone with a given theme (Dark | Light)
-renderStone :: Theme -> Stone -> Picture
-renderStone theme (x, y, char) = stonePicture <> characterPicture
-    where
-        fgcolor = getForegroundColor theme
-        x' = fromIntegral x
-        y' = fromIntegral y
-        stonePicture = translate (x' + 25.0) (y' + 20.0)
-                (rollingStone theme)
-        characterPicture = translate x' y'
-                (color fgcolor (scale 0.5 0.5 (Text [char])))
-
--- renders a list of stones 
-renderStones :: Theme -> [Stone] -> Picture
-renderStones _ []       = blank
-renderStones theme (n : ns) = pictures [renderStone theme n,
-                                    renderStones theme ns]
 
 -- 
 drawBlock :: Theme -> Block -> Picture
@@ -84,11 +63,12 @@ portal = portal' [4, 16 .. 40] yellow
 
 -- Player is a static image for now. 
 -- Maybe it will animate in the final submission
-playerSprite :: Theme -> Picture
-playerSprite theme = pictures [head, body, hands, legs]
+playerSprite :: Theme -> Player -> Picture
+playerSprite theme (x, y) = translate x y (pictures [head_, body, hands, legs])
     where
         fgcolor = getForegroundColor theme
-        head = translate 0 120 (color fgcolor (circleSolid 17.5))
+        -- additional _ to seperate from head function
+        head_ = translate 0 120 (color fgcolor (circleSolid 17.5))
         body = translate 0 60 (color fgcolor (rectangleSolid 8 85))
         hands = translate 0 60 (leftHand <> rightHand)
         legs = translate 0 (-15) (leftLeg <> rightLeg)
@@ -112,6 +92,7 @@ cage theme = pictures [
             color (getBackgroundColor theme) (rectangleSolid 90 90)
             ]
         bars = color (getForegroundColor theme) (bars' 3)
+        bars' :: Int -> Picture
         bars' 0 = blank
         bars' n = rectangleSolid 5 98
             <> translate 25 0 (bars' (n-1))
@@ -121,9 +102,10 @@ rollingStone theme = color (getForegroundColor theme) (thickCircle 42.5 15)
 
 -- Picture of a balloon for pptx704
 balloon :: Picture 
-balloon = pictures [circle, wire]
+balloon = pictures [circle_, wire]
     where 
-        circle = translate 0 60 (circleSolid 30)
+        -- _ to differentiate from circle
+        circle_ = translate 0 60 (circleSolid 30)
         wire = rectangleSolid 2 100
 
 -- A button container for the control boxes 
@@ -143,13 +125,15 @@ exitButton = pictures [box, exitIcon]
 pauseButton :: Picture 
 pauseButton = pictures [box, pauseIcon]
     where 
-        box = translate 3 0 buttonBox 
-        line = rectangleSolid 3 20
-        pauseIcon = translate 0.1 0 (pictures [line, translate 5 0 line])
+        box = translate 3 0 buttonBox
+        -- additional _ to seperate from line :: Picture 
+        line_ = rectangleSolid 3 20
+        pauseIcon = translate 0.1 0 (pictures [line_, translate 5 0 line_])
 
 -- change theme controller 
 changeThemeButton :: Picture 
-changeThemeButton = pictures [box, circle]
+changeThemeButton = pictures [box, circle_]
     where 
         box = translate 3 0 buttonBox 
-        circle = translate 3 0 (circleSolid 7)
+        -- _ is there for the same reason as others
+        circle_ = translate 3 0 (circleSolid 7)

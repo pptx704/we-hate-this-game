@@ -10,12 +10,12 @@ window = InWindow "Random window" (1600, 900) (100, 100)
 drawColumn :: Theme -> [Block] -> Picture
 drawColumn t (col:cols) =
     drawBlock t col <> translate 100 0 (drawColumn t cols)
-drawColumn t [] = blank
+drawColumn _ [] = blank
 
 drawRows :: Theme -> [[Block]] -> Picture
-drawRows t (row: rows) =
+drawRows t (row: rows) = 
     drawColumn t row <> translate 0 (-100) (drawRows t rows)
-drawRows t [] = blank
+drawRows _ [] = blank
 
 getBackground :: Theme -> [[Block]] -> Picture
 getBackground t bg = translate (-750) 400 (drawRows t bg)
@@ -35,5 +35,5 @@ lv6 :: [[Block]]
 lv6 =
     [allBlock WallBlock 16] ++
     map (const borders) [1..4] ++
-    map (\x -> allBlock Empty 16) [0, 1] ++
-    map (\x -> allBlock WallBlock 16) [0, 1]
+    map (\_ -> allBlock Empty 16) [0, 1] ++
+    map (\_ -> allBlock WallBlock 16) [0, 1]
