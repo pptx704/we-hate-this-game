@@ -30,7 +30,7 @@ getCellType _ [] = Empty
 
 -- | Converts a coordinate to the cell inside the grid syste
 -- >>> getCellPos (200, -600)
--- NOW (2,6)
+-- (2,6)
 getCellPos :: Player -> (Int, Int)
 getCellPos (x, y) = (div' x 100, abs $ div' y 100)
 
@@ -38,7 +38,7 @@ getCellPos (x, y) = (div' x 100, abs $ div' y 100)
 -- | Generalized movement function. Checks if a the new grid position of the
 -- player is a block or empty. If empty then player moves, else not.
 applyMovement :: SpecialKey -> State a -> State a
-applyMovement k (State theme grid (x, y) stones losingState)
+applyMovement k currentState@(State theme grid (x, y) stones losingState)
     = case k of
         KeyRight -> State theme grid (newPos (x,y) (x+30, y)) stones losingState
         KeyLeft -> State theme grid (newPos (x,y) (x-30, y)) stones losingState
@@ -46,7 +46,7 @@ applyMovement k (State theme grid (x, y) stones losingState)
         -- KeyUp -> State theme grid (newPos (x,y) (x, y+30)) stones losingState
         -- KeyDown -> State theme grid (newPos (x,y) (x, y-30)) stones losingState
         KeySpace -> State theme (changeCell (getCellPos (x, y)) (const $ NumberedBlock 5) grid) (x, y) stones losingState
-        _ -> State theme grid (x, y) stones losingState
+        _ -> currentState
         where
             newPos a b = case getCellType (getCellPos b) grid of
                 Empty -> b

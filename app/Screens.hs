@@ -8,6 +8,10 @@ import WeHateThisGame
 window :: Display
 window = InWindow "Random window" (1600, 900) (100, 100)
 
+-- | Gets the world generated on (0,0) and places it on top corner
+drawWorld :: (State a -> Picture) -> State a -> Picture
+drawWorld f a = translate (-750) 400 $ f a
+
 -- | The next two functions draw a grid to game map
 drawColumn :: Theme -> [Block] -> Picture
 drawColumn t (col:cols) =
