@@ -6,6 +6,7 @@ data Block =
     | JumpingBlock 
     | WallBlock 
     | NumberedBlock Int
+    | Portal
     deriving Show
 
 -- | There are two themes, dark and light
@@ -14,12 +15,12 @@ data Theme =
     DarkTheme 
     | LightTheme
 
--- | Player coordinate
-type Player = (Float, Float)
+-- | Player coordinate and movement direction
+type Player = (Float, Float, Movement)
 
--- | Movement type, will be used for improving collisions 
+-- | Movement type, will be used for improving collisions
 -- and to implement gravity
-data Movement = ToUp | ToLeft | ToRight
+data Movement = ToLeft | ToRight | Still
 
 -- | Generalized game state
 data State a = State Theme [[Block]] Player a Bool

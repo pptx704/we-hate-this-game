@@ -1,5 +1,6 @@
 module Main where
 import Level6
+import Level8
 import WeHateThisGame
 -- import Assets (getBackgroundColor)
 -- import Graphics.Gloss (display)
@@ -9,4 +10,4 @@ import WeHateThisGame
 main :: IO ()
 -- main = game DarkTheme
 --main = display window (getBackgroundColor LightTheme) (getBackground LightTheme lv6)
-main = game6 DarkTheme
+main = game8 LightTheme

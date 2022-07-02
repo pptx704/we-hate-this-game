@@ -52,6 +52,7 @@ drawBlock _ Empty = blank
 drawBlock t WallBlock = wallBlock t
 drawBlock t JumpingBlock = jumpingBlock t
 drawBlock t (NumberedBlock a) = numberedBlock t a
+drawBlock _ Portal = portal
 
 -- Portal is a circle with yellow gradient. It doesn't depend on theme
 portal :: Picture
@@ -59,12 +60,12 @@ portal = portal' [4, 16 .. 40] yellow
     where
         portal' [] _ = blank
         portal' (i:is) c = 
-            pictures [portal' is (light c), color c (circleSolid i)]
+            portal' is (light c) <> color c (circleSolid i)
 
--- Player is a static image for now. 
+-- Player is a static image for now. marker
 -- Maybe it will animate in the final submission
 playerSprite :: Theme -> Player -> Picture
-playerSprite theme (x, y) = translate x y (pictures [head_, body, hands, legs])
+playerSprite theme (x, y, _) = translate x y (pictures [head_, body, hands, legs, marker])
     where
         fgcolor = getForegroundColor theme
         -- additional _ to seperate from head function
@@ -78,6 +79,7 @@ playerSprite theme (x, y) = translate x y (pictures [head_, body, hands, legs])
         leg' = color fgcolor (rectangleSolid 5 70)
         leftLeg = translate (-5) 0 (rotate 5 leg')
         rightLeg = translate 5 0 (rotate (-5) leg')
+        marker = color red $ circleSolid 2 -- temporary to detect player coordinate
 
 -- Cage for pptx704's balloon lvl
 cage :: Theme -> Picture
