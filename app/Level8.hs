@@ -81,7 +81,7 @@ handleWorld _ state = state
 
 -- Updates player movement if required
 updateWorld :: p -> State ([Int], [Int]) -> State ([Int], [Int])
-updateWorld _ (State theme grid player state@(_, usr) winningState) = newState
+updateWorld _ (State theme grid player state winningState) = newState
     where
         newState = State theme grid' player' state winningState
         player' = movePlayer player grid'
@@ -97,5 +97,5 @@ game8 :: Theme -> IO()
 game8 theme = do
     gen <- newStdGen
     play window black 90
-        (State theme lv8' (200, -600, Still, ToDown 0 0) (generateWorld gen, [0,0,0,0]) False)
+        (State theme lv8' (200, -200, Still, ToDown 0 1) (generateWorld gen, [0,0,0,0]) False)
         (drawWorld drawLv8) handleWorld updateWorld

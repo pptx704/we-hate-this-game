@@ -22,7 +22,7 @@ type Player = (Float, Float, Movement, JumpDirection)
 -- and to implement gravity
 data Movement = ToLeft | ToRight | Still
 
-data JumpDirection = ToUp Float Int | ToDown Float Int
+data JumpDirection = ToUp Float Float | ToDown Float Float
 
 -- | Generalized game state
 data State a = State Theme [[Block]] Player a Bool
