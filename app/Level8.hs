@@ -11,8 +11,6 @@ import Data.List (sort, group)
 -- | From the gamestate, determines Bulls and Cows
 -- Cows are intentionally distracting. It doesn't negate bulls
 -- to increase confusion
--- >>> getBulls ([1,2,3,4], [1,1,1,1])
--- [1,4]
 -- >>> getBulls ([7,5,5,3], [7,5,5,3])
 -- [4,4]
 -- >>> getBulls ([1,2,3,4], [1,3,2,4])
@@ -97,5 +95,5 @@ game8 :: Theme -> IO()
 game8 theme = do
     gen <- newStdGen
     play window black 90
-        (State theme lv8' (200, -200, Still, ToDown 0 1) (generateWorld gen, [0,0,0,0]) False)
+        (State theme lv8' (200, -600, Still, ToDown 0 1) (generateWorld gen, [0,0,0,0]) False)
         (drawWorld drawLv8) handleWorld updateWorld

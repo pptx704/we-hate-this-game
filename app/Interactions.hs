@@ -45,21 +45,25 @@ mouseToCell :: (Float, Float) -> (Int, Int)
 mouseToCell (x, y) = getCellPos (x+750, y-500)
 
 -- 
-movePlayer' :: Player -> [[Block]] -> Player
-movePlayer' player@(x, y, m, j) grid =
+moveToSide :: Player -> [[Block]] -> Player
+moveToSide player@(x, y, m, j) grid =
     case m of
         Still -> player
-        ToRight -> newPos (x, y) (x + movementCoeff, y)
-        ToLeft -> newPos (x, y) (x - movementCoeff, y)
+        ToRight -> newPos (x, y) (x + movementCoeff, y) 30
+        ToLeft -> newPos (x, y) (x - movementCoeff, y) (-30)
     where
-        newPos (a1, a2) b@(b1, b2) = case getCellType (getCellPos b) grid of
-            Empty -> (b1, b2, m, j)
-            Portal -> (b1, b2, m, j)
+        newPos (a1, a2) (b1, b2) c 
+            = case (upperSideCell b1 b2 c, lowerSideCell b1 b2 c) of
+            (Empty, Empty) -> (b1, b2, m, j)
+            (Portal, Empty) -> (b1, b2, m, j)
+            (Empty, Portal) -> (b1, b2, m, j)
             _ -> (a1, a2, m, j)
         movementCoeff = 2.0
+        upperSideCell b1 b2 c = getCellType (getCellPos (b1+c,b2)) grid
+        lowerSideCell b1 b2 c = getCellType (getCellPos (b1+c, b2+50)) grid
 
 movePlayer :: Player -> [[Block]] -> Player
-movePlayer player grid = applyGravity (movePlayer' player grid) grid
+movePlayer player grid = applyGravity (moveToSide player grid) grid
 
 applyGravity :: Player -> [[Block]] -> Player
 applyGravity (x, y, m, ToDown v t) grid = player'
