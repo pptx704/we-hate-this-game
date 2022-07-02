@@ -82,23 +82,6 @@ applyGravity (x, y, m, ToUp v t) grid = player'
         d = if v' < 0 then ToDown 0 0.1 else ToUp v' (t+0.1)
         v' = v - 0.02 * t
 
--- From a mouse position, determines the cell it has clicked on
-mouseToCell :: (Float, Float) -> (Int, Int)
-mouseToCell (x, y) = getCellPos (x+800, y-450)
-
--- 
-movedPlayer :: (Float, Float, Movement) -> [[Block]] -> (Float, Float, Movement)
-movedPlayer player@(x, y, m) grid =
-    case m of
-        Still -> player
-        ToRight -> newPos (x, y) (x+movementCoeff, y)
-        ToLeft -> newPos (x, y) (x-movementCoeff, y)
-    where
-        newPos (a1, a2) b@(b1, b2) = case getCellType (getCellPos b) grid of
-            Empty -> (b1, b2, m)
-            _ -> (a1, a2, m)
-        movementCoeff = 2.0
-
 -- | Generalized movement function. Checks if a the new grid position of the
 -- player is a block or empty. If empty then player moves, else not.
 applyMovement :: SpecialKey -> KeyState -> Modifiers -> State a -> State a
@@ -119,4 +102,3 @@ applyMovement k pos _ (State theme grid player@(x, y, d, j) stateVar losingState
                 ToDown 0 _ -> (x, y, d, ToUp 5 0.1)
                 _ -> player
             _ -> player
-
