@@ -65,7 +65,7 @@ portal = portal' [4, 16 .. 40] yellow
 -- Player is a static image for now. marker
 -- Maybe it will animate in the final submission
 playerSprite :: Theme -> Player -> Picture
-playerSprite theme (x, y, _) = translate x y (pictures [head_, body, hands, legs, marker])
+playerSprite theme (x, y, _, _) = translate x y (pictures [head_, body, hands, legs, marker])
     where
         fgcolor = getForegroundColor theme
         -- additional _ to seperate from head function

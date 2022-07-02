@@ -55,7 +55,7 @@ lv6 =
 lv8 :: ([Int], [Int]) -> [[Block]]
 lv8 (usr, bull) =
     [allBlock WallBlock 16, borders, bullrow, borders, usrrow]
-    ++ map (const borders) [0, 1] ++
+    ++ map (const borders) [0,1] ++ --[[Empty, WallBlock, Empty, Empty, WallBlock, Empty, Empty, Empty, Empty, WallBlock, Empty, Empty, Empty, Empty, WallBlock, Empty]] ++
     map (\_ -> allBlock WallBlock 16) [0, 1]
 
     where

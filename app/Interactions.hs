@@ -34,43 +34,51 @@ getCellType _ [] = Empty
 -- | changeCell and getCell can be merged or something??
 
 -- | Converts a coordinate to the cell inside the grid syste
--- >>> getCellPos (200, -600)
--- (2,6)
+-- >>> getCellPos (250, -650)
+-- NOW (3,6)
 getCellPos :: (Float, Float) -> (Int, Int)
-getCellPos (x, y) = (div' x 100, abs $ div' y 100)
+getCellPos (x, y) = (div' (x+50) 100, abs $ div' (y+50) 100)
 
 
 -- From a mouse position, determines the cell it has clicked on
 mouseToCell :: (Float, Float) -> (Int, Int)
-mouseToCell (x, y) = getCellPos (x+800, y-450)
+mouseToCell (x, y) = getCellPos (x+750, y-500)
 
 -- 
-movePlayer :: (Float, Float, Movement) -> [[Block]] -> (Float, Float, Movement)
-movePlayer player@(x, y, m) grid =
+movePlayer :: Player -> [[Block]] -> Player
+movePlayer player@(x, y, m, j) grid =
     case m of
         Still -> player
-        ToRight -> newPos (x, y) (x+movementCoeff, y)
-        ToLeft -> newPos (x, y) (x-movementCoeff, y)
+        ToRight -> newPos (x, y) (x + movementCoeff, y)
+        ToLeft -> newPos (x, y) (x - movementCoeff, y)
     where
         newPos (a1, a2) b@(b1, b2) = case getCellType (getCellPos b) grid of
-            Empty -> (b1, b2, m)
-            _ -> (a1, a2, m)
+            Empty -> (b1, b2, m, j)
+            Portal -> (b1, b2, m, j)
+            _ -> (a1, a2, m, j)
         movementCoeff = 2.0
+
+-- applyGravity :: Player -> [[Block]] -> Player
+-- applyGravity player@(x, y, m, ToDown v t) grid = player
+--     where
+--         player' = newPos (x, y) (x+movementCoeff, y)
+
+-- applyGravity player _ = player
 
 -- | Generalized movement function. Checks if a the new grid position of the
 -- player is a block or empty. If empty then player moves, else not.
 applyMovement :: SpecialKey -> KeyState -> Modifiers -> State a -> State a
 -- Temporary applymovement for theme changing
 -- Modifiers shift ctrl alt
-applyMovement KeySpace Down (Modifiers Down _ _) (State theme grid (x, y, m) stateVar losingState)
-    = State (changeTheme theme) grid (x, y, m) stateVar losingState
+applyMovement KeySpace Down (Modifiers Down _ _) (State theme grid player@(x, y, m, j) stateVar losingState)
+    = State (changeTheme theme) grid player stateVar losingState
 
-applyMovement k pos _ (State theme grid player@(x, y, _) stateVar losingState) =
+applyMovement k pos _ (State theme grid player@(x, y, _, j) stateVar losingState) =
     State theme grid player' stateVar losingState
     where
         player' = case (k, pos) of
-            (KeyRight, Down) -> (x, y, ToRight)
-            (KeyRight, Up) -> (x, y, Still)
-            (KeyLeft, Down) -> (x, y, ToLeft)
-            (KeyLeft, Up) -> (x, y, Still)
+            (KeyRight, Down) -> (x, y, ToRight, j)
+            (KeyRight, Up) -> (x, y, Still, j)
+            (KeyLeft, Down) -> (x, y, ToLeft, j)
+            (KeyLeft, Up) -> (x, y, Still, j)
             _ -> player
