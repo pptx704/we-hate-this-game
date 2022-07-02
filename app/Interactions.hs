@@ -3,6 +3,11 @@ import Graphics.Gloss.Interface.Pure.Game
 import WeHateThisGame
 import Data.Fixed (div')
 
+-- | Changes the theme
+changeTheme :: Theme -> Theme
+changeTheme LightTheme = DarkTheme
+changeTheme DarkTheme = LightTheme
+
 -- | The following two functions are used to change a block from it's index
 changeCellAtCol :: Int -> (Block -> Block) -> [Block] -> [Block]
 changeCellAtCol _ _ [] = []
@@ -31,23 +36,40 @@ getCellType _ [] = Empty
 -- | Converts a coordinate to the cell inside the grid syste
 -- >>> getCellPos (200, -600)
 -- (2,6)
-getCellPos :: Player -> (Int, Int)
+getCellPos :: (Float, Float) -> (Int, Int)
 getCellPos (x, y) = (div' x 100, abs $ div' y 100)
 
 
+-- From a mouse position, determines the cell it has clicked on
+mouseToCell :: (Float, Float) -> (Int, Int)
+mouseToCell (x, y) = getCellPos (x+800, y-450)
+
+-- 
+movedPlayer :: (Float, Float, Movement) -> [[Block]] -> (Float, Float, Movement)
+movedPlayer player@(x, y, m) grid =
+    case m of
+        Still -> player
+        ToRight -> newPos (x, y) (x+movementCoeff, y)
+        ToLeft -> newPos (x, y) (x-movementCoeff, y)
+    where
+        newPos (a1, a2) b@(b1, b2) = case getCellType (getCellPos b) grid of
+            Empty -> (b1, b2, m)
+            _ -> (a1, a2, m)
+        movementCoeff = 2.0
+
 -- | Generalized movement function. Checks if a the new grid position of the
 -- player is a block or empty. If empty then player moves, else not.
-applyMovement :: SpecialKey -> State a -> State a
-applyMovement k currentState@(State theme grid (x, y) stones losingState)
-    = case k of
-        KeyRight -> State theme grid (newPos (x,y) (x+30, y)) stones losingState
-        KeyLeft -> State theme grid (newPos (x,y) (x-30, y)) stones losingState
-        -- the following 3 are for testing purpose. Will be removed
-        -- KeyUp -> State theme grid (newPos (x,y) (x, y+30)) stones losingState
-        -- KeyDown -> State theme grid (newPos (x,y) (x, y-30)) stones losingState
-        KeySpace -> State theme (changeCell (getCellPos (x, y)) (const $ NumberedBlock 5) grid) (x, y) stones losingState
-        _ -> currentState
-        where
-            newPos a b = case getCellType (getCellPos b) grid of
-                Empty -> b
-                _ -> a
+applyMovement :: SpecialKey -> KeyState -> State a -> State a
+-- Temporary applymovement for theme changing
+applyMovement KeySpace Down (State theme grid (x, y, m) stateVar losingState) 
+    = State (changeTheme theme) grid (x, y, m) stateVar losingState
+
+applyMovement k pos (State theme grid (x, y, m) stateVar losingState) =
+    State theme grid player' stateVar losingState
+    where
+        player' = case (k, pos) of
+            (KeyRight, Down) -> (x, y, ToRight)
+            (KeyRight, Up) -> (x, y, Still)
+            (KeyLeft, Down) -> (x, y, ToLeft)
+            (KeyLeft, Up) -> (x, y, Still)
+            _ -> (x, y, m)
