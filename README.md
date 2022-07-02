@@ -31,7 +31,7 @@ A logic-based puzzle game that makes the players hate the game. Lack of proper i
 ### Setting-up
 - Have GHC 8.10.7 or 8.8.4 installed with Cabal. Better if you have GHCUP installed.
 - Clone this repository
-- Run `cabal v2-run --disable-tests`. If everything goes fine, you will see a blue screen with a black circle.
+- Run `cabal v2-run --disable-tests`. If everything goes fine, you will see a game level.
 
 ### Code
 - Work on existing files
