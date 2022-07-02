@@ -89,6 +89,7 @@ updateWorld _ (State theme grid player state winningState) = newState
                 else grid
         grid'' = changeCell (15, 5) (const Empty) grid
 
+
 -- | Game function
 -- data State = State Theme [[Block]] Player ([Int], [Int]) Bool
 game8 :: Theme -> IO()
