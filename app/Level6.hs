@@ -75,8 +75,9 @@ handleWorld (EventKey (Char char) Down _ _)
 
 -- | If an specialkey (arrows for now) is pressed then generalized
 -- movement function is called
-handleWorld (EventKey (SpecialKey k) pos _ _) state
-    = applyMovement k pos state
+handleWorld (EventKey (SpecialKey k) pos sp _) state
+    = applyMovement k pos sp state
+    
 -- | For every other case, world is as is
 handleWorld _ state = state
 
@@ -86,7 +87,7 @@ decreaseStone t (x, y, rot, char) = (x - 50*t, y, rot - t * 45, char)
 
 -- | checks if the stone touches the player sprite 
 touchesPlayer :: [Stone] -> Player -> Bool
-touchesPlayer ((s, _, _,  _) : _) (x, _, _) = s-25 <= x+25
+touchesPlayer ((s, _, _,  _) : _) (x, _, _, _) = s-25 <= x+25
 touchesPlayer _ _ = True
 
 -- | Update the worlds based on time passed
@@ -100,7 +101,8 @@ updateWorld t (State theme grid player stones losingState) = newState
         newState = if lostGame then
             State theme grid player' [] True else
             State theme grid player' newStonesLoc losingState    
-        player' = movedPlayer player grid
+        player' = movePlayer player grid
+
         
 
 -- make the theme global later, somehow?
@@ -109,5 +111,5 @@ game6 :: Theme -> IO ()
 game6 theme = do
     gen <- newStdGen
     play window black 90
-        (State theme lv6 (200, -600, Still) (generateWorld (generateString gen) 700) False)
+        (State theme lv6 (200, -600, Still, ToDown 0 0) (generateWorld (generateString gen) 700) False)
         (drawWorld drawLv6) handleWorld updateWorld

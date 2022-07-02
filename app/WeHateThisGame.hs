@@ -16,11 +16,13 @@ data Theme =
     | LightTheme
 
 -- | Player coordinate and movement direction
-type Player = (Float, Float, Movement)
+type Player = (Float, Float, Movement, JumpDirection)
 
 -- | Movement type, will be used for improving collisions
 -- and to implement gravity
 data Movement = ToLeft | ToRight | Still
+data JumpDirection = ToUp Float Float | ToDown Float Float
+
 
 -- | Generalized game state
 data State a = State Theme [[Block]] Player a Bool

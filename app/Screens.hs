@@ -3,6 +3,7 @@ module Screens where
 import Graphics.Gloss
 import Assets
 import WeHateThisGame
+import Interactions (changeCell)
 
 -- | Game window 1600 x 900
 window :: Display
@@ -55,7 +56,7 @@ lv6 =
 lv8 :: ([Int], [Int]) -> [[Block]]
 lv8 (usr, bull) =
     [allBlock WallBlock 16, borders, bullrow, borders, usrrow]
-    ++ map (const borders) [0, 1] ++
+    ++ map (const borders) [0,1] ++
     map (\_ -> allBlock WallBlock 16) [0, 1]
 
     where

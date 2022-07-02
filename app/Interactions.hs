@@ -34,11 +34,53 @@ getCellType _ [] = Empty
 -- | changeCell and getCell can be merged or something??
 
 -- | Converts a coordinate to the cell inside the grid syste
--- >>> getCellPos (200, -600)
--- (2,6)
+-- >>> getCellPos (250, -650)
+-- NOW (3,6)
 getCellPos :: (Float, Float) -> (Int, Int)
-getCellPos (x, y) = (div' x 100, abs $ div' y 100)
+getCellPos (x, y) = (div' (x+50) 100, abs $ div' (y+50) 100)
 
+
+-- From a mouse position, determines the cell it has clicked on
+mouseToCell :: (Float, Float) -> (Int, Int)
+mouseToCell (x, y) = getCellPos (x+750, y-500)
+
+-- 
+moveToSide :: Player -> [[Block]] -> Player
+moveToSide player@(x, y, m, j) grid =
+    case m of
+        Still -> player
+        ToRight -> newPos (x, y) (x + movementCoeff, y) 30
+        ToLeft -> newPos (x, y) (x - movementCoeff, y) (-30)
+    where
+        newPos (a1, a2) (b1, b2) c 
+            = case (upperSideCell b1 b2 c, lowerSideCell b1 b2 c) of
+            (Empty, Empty) -> (b1, b2, m, j)
+            (Portal, Empty) -> (b1, b2, m, j)
+            (Empty, Portal) -> (b1, b2, m, j)
+            _ -> (a1, a2, m, j)
+        movementCoeff = 2.0
+        upperSideCell b1 b2 c = getCellType (getCellPos (b1+c,b2)) grid
+        lowerSideCell b1 b2 c = getCellType (getCellPos (b1+c, b2+50)) grid
+
+movePlayer :: Player -> [[Block]] -> Player
+movePlayer player grid = applyGravity (moveToSide player grid) grid
+
+applyGravity :: Player -> [[Block]] -> Player
+applyGravity (x, y, m, ToDown v t) grid = player'
+    where
+        player' = newPos (x, y) (x, y - v')
+        newPos (a1, a2) (b1, b2) = case getCellType (getCellPos (b1, b2-50)) grid of
+            Empty -> (b1, b2, m, ToDown v' (t+0.1))
+            _ -> (a1, a2, m, ToDown 0 0.1)
+        v' = v + 0.02 * t
+applyGravity (x, y, m, ToUp v t) grid = player'
+    where
+        player' = newPos (x, y) (x, y + v')
+        newPos (a1, a2) (b1, b2) = case getCellType (getCellPos (b1, b2+150)) grid of
+            Empty -> (b1, b2, m, d)
+            _ -> (a1, a2, m, ToDown 0 0.1)
+        d = if v' < 0 then ToDown 0 0.1 else ToUp v' (t+0.1)
+        v' = v - 0.02 * t
 
 -- From a mouse position, determines the cell it has clicked on
 mouseToCell :: (Float, Float) -> (Int, Int)
@@ -59,17 +101,22 @@ movedPlayer player@(x, y, m) grid =
 
 -- | Generalized movement function. Checks if a the new grid position of the
 -- player is a block or empty. If empty then player moves, else not.
-applyMovement :: SpecialKey -> KeyState -> State a -> State a
+applyMovement :: SpecialKey -> KeyState -> Modifiers -> State a -> State a
 -- Temporary applymovement for theme changing
-applyMovement KeySpace Down (State theme grid (x, y, m) stateVar losingState) 
-    = State (changeTheme theme) grid (x, y, m) stateVar losingState
+-- Modifiers shift ctrl alt
+applyMovement KeySpace Down (Modifiers Down _ _) (State theme grid player stateVar losingState)
+    = State (changeTheme theme) grid player stateVar losingState
 
-applyMovement k pos (State theme grid (x, y, m) stateVar losingState) =
+applyMovement k pos _ (State theme grid player@(x, y, d, j) stateVar losingState) =
     State theme grid player' stateVar losingState
     where
         player' = case (k, pos) of
-            (KeyRight, Down) -> (x, y, ToRight)
-            (KeyRight, Up) -> (x, y, Still)
-            (KeyLeft, Down) -> (x, y, ToLeft)
-            (KeyLeft, Up) -> (x, y, Still)
-            _ -> (x, y, m)
+            (KeyRight, Down) -> (x, y, ToRight, j)
+            (KeyRight, Up) -> (x, y, Still, j)
+            (KeyLeft, Down) -> (x, y, ToLeft, j)
+            (KeyLeft, Up) -> (x, y, Still, j)
+            (KeySpace, Down) -> case j of
+                ToDown 0 _ -> (x, y, d, ToUp 5 0.1)
+                _ -> player
+            _ -> player
+
