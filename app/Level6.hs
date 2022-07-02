@@ -7,7 +7,6 @@ import Screens
 import WeHateThisGame
 import Interactions
 import System.Random
-import Data.Fixed (div')
 
 -- generates the state from a given string 
 generateWorld :: String -> Float -> [Stone]
@@ -15,12 +14,10 @@ generateWorld []       _ = []
 generateWorld (n : ns) dx = (dx, 0, 0, n) : generateWorld ns (dx + 150)
 
 -- | Generates a list of chars for the stones
-generateString :: [Char]
-generateString = take 10 $ 
+generateString :: StdGen -> [Char]
+generateString gen = take 10 $ 
     randomRs ('a', 'z') gen
-    where 
-        gen = mkStdGen $ div' (pi * 40000) 1 -- fix gen for randomness
-
+    
 -- | (x, y, rot, char)
 type Stone = (Float, Float, Float, Char)
 
@@ -47,9 +44,9 @@ renderStones theme (n : ns)
 drawLv6 :: State [Stone] -> Picture
 drawLv6 (State theme grid player stones losingState) 
     = case (stones, losingState) of
-    ([], True) -> pictures [getBackground theme grid, player_, losingMessage]
-    ([], False) -> pictures [getBackground theme grid, player_, winningMessage]
-    (_, _) -> pictures [getBackground theme grid, player_, rollingStones]
+    ([], True) -> pictures [background, levelmap grid, player_, losingMessage]
+    ([], False) -> pictures [background, levelmap grid', player_, winningMessage]
+    (_, _) -> pictures [background, levelmap grid, player_, rollingStones]
     where
         fgcolor = getForegroundColor theme
         player_ = playerSprite theme player
@@ -58,7 +55,9 @@ drawLv6 (State theme grid player stones losingState)
         losingMessage = translate 250 (-400)
             (color fgcolor (scale 1.5 1.5 (Text "YOU LOSE")))
         rollingStones = translate 0 (-600) (renderStones theme stones)
-
+        grid' = changeCell (15, 6) (const Portal) grid
+        background = screenBackground theme
+        levelmap = getLevelMap theme
 
 -- | Handles events
 handleWorld :: Event -> State [Stone] -> State [Stone]
@@ -71,12 +70,13 @@ handleWorld (EventKey (Char char) Down _ _)
         matches = char == firstCharacter
         newState = if matches then
             State theme grid player remStones losingState else
-            State theme grid player 
-                initial losingState
+            State theme grid player initial losingState
+
+
 -- | If an specialkey (arrows for now) is pressed then generalized
 -- movement function is called
-handleWorld (EventKey (SpecialKey k) Down _ _) state
-    = applyMovement k state
+handleWorld (EventKey (SpecialKey k) pos _ _) state
+    = applyMovement k pos state
 -- | For every other case, world is as is
 handleWorld _ state = state
 
@@ -86,7 +86,7 @@ decreaseStone t (x, y, rot, char) = (x - 50*t, y, rot - t * 45, char)
 
 -- | checks if the stone touches the player sprite 
 touchesPlayer :: [Stone] -> Player -> Bool
-touchesPlayer ((s, _, _,  _) : _) (x, _) = s-25 <= x+25
+touchesPlayer ((s, _, _,  _) : _) (x, _, _) = s-25 <= x+25
 touchesPlayer _ _ = True
 
 -- | Update the worlds based on time passed
@@ -98,17 +98,16 @@ updateWorld t (State theme grid player stones losingState) = newState
         lostGame = touchesPlayer stones player
         newStonesLoc = map (decreaseStone t) stones
         newState = if lostGame then
-            State theme grid player [] True else
-            State theme grid player newStonesLoc losingState
+            State theme grid player' [] True else
+            State theme grid player' newStonesLoc losingState    
+        player' = movedPlayer player grid
+        
 
 -- make the theme global later, somehow?
--- data State [Stone] = State Theme [[Block]] Player [Stone] Bool -- list of rolling stones, 
--- and a bool (True - if the user has lost)
+-- data State [Stone] = State Theme [[Block]] Player [Stone] Bool
 game6 :: Theme -> IO ()
-game6 theme = play window (getBackgroundColor theme) 120
-        (State theme lv6 (200, -600) (generateWorld generateString 700) False)
+game6 theme = do
+    gen <- newStdGen
+    play window black 90
+        (State theme lv6 (200, -600, Still) (generateWorld (generateString gen) 700) False)
         (drawWorld drawLv6) handleWorld updateWorld
-
--- game = play Display Color Int world (world -> Picture) (Event -> world -> world) (Float -> world -> world)
--- you have to render the stones from a string 
--- the world is a string 
