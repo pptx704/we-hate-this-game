@@ -45,8 +45,8 @@ mouseToCell :: (Float, Float) -> (Int, Int)
 mouseToCell (x, y) = getCellPos (x+800, y-450)
 
 -- 
-movedPlayer :: (Float, Float, Movement) -> [[Block]] -> (Float, Float, Movement)
-movedPlayer player@(x, y, m) grid =
+movePlayer :: (Float, Float, Movement) -> [[Block]] -> (Float, Float, Movement)
+movePlayer player@(x, y, m) grid =
     case m of
         Still -> player
         ToRight -> newPos (x, y) (x+movementCoeff, y)
@@ -59,12 +59,13 @@ movedPlayer player@(x, y, m) grid =
 
 -- | Generalized movement function. Checks if a the new grid position of the
 -- player is a block or empty. If empty then player moves, else not.
-applyMovement :: SpecialKey -> KeyState -> State a -> State a
+applyMovement :: SpecialKey -> KeyState -> Modifiers -> State a -> State a
 -- Temporary applymovement for theme changing
-applyMovement KeySpace Down (State theme grid (x, y, m) stateVar losingState) 
+-- Modifiers shift ctrl alt
+applyMovement KeySpace Down (Modifiers Down _ _) (State theme grid (x, y, m) stateVar losingState)
     = State (changeTheme theme) grid (x, y, m) stateVar losingState
 
-applyMovement k pos (State theme grid (x, y, m) stateVar losingState) =
+applyMovement k pos _ (State theme grid player@(x, y, _) stateVar losingState) =
     State theme grid player' stateVar losingState
     where
         player' = case (k, pos) of
@@ -72,4 +73,4 @@ applyMovement k pos (State theme grid (x, y, m) stateVar losingState) =
             (KeyRight, Up) -> (x, y, Still)
             (KeyLeft, Down) -> (x, y, ToLeft)
             (KeyLeft, Up) -> (x, y, Still)
-            _ -> (x, y, m)
+            _ -> player

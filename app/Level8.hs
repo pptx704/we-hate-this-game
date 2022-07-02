@@ -78,8 +78,8 @@ handleWorld (EventKey (MouseButton LeftButton) Down _ coord)
 
 -- | If an specialkey (arrows for now) is pressed then generalized
 -- movement function is called
-handleWorld (EventKey (SpecialKey k) pos _ _) state
-    = applyMovement k pos state
+handleWorld (EventKey (SpecialKey k) pos sp _) state
+    = applyMovement k pos sp state
     
 -- | For every other case, world is as is
 handleWorld _ state = state
@@ -89,7 +89,7 @@ updateWorld :: p -> State a -> State a
 updateWorld _ (State theme grid player gamestate winningstate) = newState
     where
         newState = State theme grid player' gamestate winningstate
-        player' = movedPlayer player grid
+        player' = movePlayer player grid
 
 -- | Game function
 -- data State = State Theme [[Block]] Player ([Int], [Int]) Bool

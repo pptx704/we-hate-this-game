@@ -75,8 +75,8 @@ handleWorld (EventKey (Char char) Down _ _)
 
 -- | If an specialkey (arrows for now) is pressed then generalized
 -- movement function is called
-handleWorld (EventKey (SpecialKey k) pos _ _) state
-    = applyMovement k pos state
+handleWorld (EventKey (SpecialKey k) pos sp _) state
+    = applyMovement k pos sp state
 -- | For every other case, world is as is
 handleWorld _ state = state
 
@@ -100,7 +100,7 @@ updateWorld t (State theme grid player stones losingState) = newState
         newState = if lostGame then
             State theme grid player' [] True else
             State theme grid player' newStonesLoc losingState    
-        player' = movedPlayer player grid
+        player' = movePlayer player grid
         
 
 -- make the theme global later, somehow?

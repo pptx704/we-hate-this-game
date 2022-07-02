@@ -10,4 +10,4 @@ import WeHateThisGame
 main :: IO ()
 -- main = game DarkTheme
 --main = display window (getBackgroundColor LightTheme) (getBackground LightTheme lv6)
-main = game8 LightTheme
+main = game8 DarkTheme
