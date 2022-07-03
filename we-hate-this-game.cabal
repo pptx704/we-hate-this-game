@@ -27,8 +27,8 @@ executable we-hate-this-game
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    other-modules: Assets, Interactions, Screens, WeHateThisGame, Level0, Level3
-    --, Level6, Level8, Level5, Level7, Level4
+    other-modules: Assets, Interactions, Screens, WeHateThisGame, Level0, Level3 
+        , Level6, Level8, Level5, Level7, Level4
     ghc-options: 
             -O2 -Wall
             -threaded
