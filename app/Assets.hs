@@ -83,33 +83,27 @@ playerSprite theme (x, y, _, _) = translate x y (pictures [head_, body, hands, l
 
 -- Cage for pptx704's balloon lvl
 cage :: Theme -> Picture
-cage theme = pictures [
-        frame, 
-        translate (-25) 0 bars
-        ]
+cage theme = color (getForegroundColor theme) frame
     where
-        frame = 
-            pictures [
-            jumpingBlock theme,
-            color (getBackgroundColor theme) (rectangleSolid 90 90)
-            ]
-        bars = color (getForegroundColor theme) (bars' 3)
-        bars' :: Int -> Picture
-        bars' 0 = blank
-        bars' n = rectangleSolid 5 98
-            <> translate 25 0 (bars' (n-1))
+        frame = upperBar <> lowerBar <> leftBar <> rightBar
+        upperBar = translate 0 48 horizontalBar
+        lowerBar = translate 0 (-48) horizontalBar
+        leftBar = translate (-48) 0 verticalBar
+        rightBar = translate 48 0 verticalBar
+        horizontalBar = rectangleSolid 100 4
+        verticalBar = rectangleSolid  4 100
 
 -- | Stones for lv 6. Some other level will also use it.
 rollingStone :: Theme -> Picture
 rollingStone theme = color (getForegroundColor theme) (thickCircle 42.5 10)
 
 -- Picture of a balloon for pptx704
-balloon :: Picture 
-balloon = pictures [circle_, wire]
+balloon :: Theme -> Picture 
+balloon t = circle_ <> color red ( wire <> circleSolid 1)
     where 
         -- _ to differentiate from circle
-        circle_ = translate 0 60 (circleSolid 30)
-        wire = rectangleSolid 2 100
+        circle_ = color (getForegroundColor t) $ circleSolid 45
+        wire = translate 0 (-195) $ rectangleSolid 2 300
 
 -- A button container for the control boxes 
 buttonBox :: Picture 

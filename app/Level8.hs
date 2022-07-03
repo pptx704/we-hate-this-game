@@ -78,7 +78,7 @@ handleWorld (EventKey (SpecialKey k) pos sp _) state
 handleWorld _ state = state
 
 -- Updates player movement if required
-updateWorld :: p -> State ([Int], [Int]) -> State ([Int], [Int])
+updateWorld :: Float -> State ([Int], [Int]) -> State ([Int], [Int])
 updateWorld _ (State theme grid player state winningState) = newState
     where
         newState = State theme grid' player' state winningState
