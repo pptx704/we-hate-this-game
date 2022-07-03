@@ -93,14 +93,32 @@ applyGravity (x, y, m, ToUp v t) grid = player'
 movePlayer :: Player -> [[Block]] -> Player
 movePlayer player grid = applyGravity (moveToSide player grid) grid
 
--- | Generalized function to deal with KeyPressing. 
---- Apart from movement keys, it also deals with hotkeys
+updateStates :: State a -> State a
+updateStates state@(State theme grid player stateVar winningState gameState)
+    = case gameState of
+        Over -> state
+        Paused -> state
+        _ -> State theme grid player' stateVar winningState gs
+    where
+        gs = if playerOutOfScreen player' then Over else gameState
+        player' = movePlayer player grid
+
+-- | Generalized function to deal with KeyPressing.
+-- Apart from movement keys, it also deals with hotkeys
 -- Modifiers shift ctrl alt
 applyMovement :: SpecialKey -> KeyState -> Modifiers -> State a -> State a
-applyMovement KeySpace Down (Modifiers Down _ _) (State theme grid player stateVar losingState)
-    = State (changeTheme theme) grid player stateVar losingState
-applyMovement k pos _ (State theme grid player@(x, y, d, j) stateVar losingState) =
-    State theme grid player' stateVar losingState
+applyMovement k Down (Modifiers Down _ _) state@(State theme grid player stateVar winningState gameState)
+    = case k of
+        KeySpace -> State (changeTheme theme) grid player stateVar winningState gameState
+        KeyUp -> State theme grid player stateVar winningState Paused
+        KeyDown -> State theme grid player stateVar winningState Resumed
+        _ -> state
+
+applyMovement k pos _ state@(State theme grid player@(x, y, d, j) stateVar winningState gameState) =
+    case gameState of
+        Over -> state
+        Paused -> state
+        _ -> State theme grid player' stateVar winningState gameState
     where
         player' = case (k, pos) of
             (KeyRight, Down) -> (x, y, ToRight, j)

@@ -57,7 +57,7 @@ lv0 = changeCell (15, 6) Portal lv0'
             [allBlock WallBlock 16] ++
             map (const borders) [1..4] ++
             map (\_ ->  WallBlock : allBlock Empty 15) [0, 1] ++
-            map (const smallHole) [1..4]
+            map (const smallHole) [0,1]
         smallHole = allBlock WallBlock 7 ++ allBlock Empty 2
                     ++ allBlock WallBlock 7
             

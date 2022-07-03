@@ -26,4 +26,5 @@ data JumpDirection = ToUp Float Float | ToDown Float Float
 
 
 -- | Generalized game state
-data State a = State Theme [[Block]] Player a Bool
+data State a = State Theme [[Block]] Player a Bool GameState
+data GameState = Paused | Resumed | Over | Completed
