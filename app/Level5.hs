@@ -24,18 +24,11 @@ handleWorld (EventKey (SpecialKey k) pos sp _) state@(State theme grid (x, y, d,
         player' = (x, y, d, ToUp 5 0.1)
 handleWorld _ state = state
 
-
-
 updateWorld :: Float -> State Block -> State Block
-updateWorld _ (State theme grid player state winState) = newState
+updateWorld _ (State theme grid player state winningState) = newState
     where
-        newState = State theme grid player' state winState
-        player' = getNewState player''
-        player'' = movePlayer player grid
-        getNewState p = if playerOutOfScreen p then (200, -600, Still, ToDown 0 1)
-            else p
-
-
+        newState = State theme grid player' state winningState
+        player' = movePlayer player grid
 
 -- | Game function
 -- data State = State Theme [[Block]] Player _ Bool
