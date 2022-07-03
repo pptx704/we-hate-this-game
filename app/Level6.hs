@@ -44,15 +44,12 @@ renderStones theme (n : ns)
 drawLv6 :: State [Stone] -> Picture
 drawLv6 (State theme grid player stones losingState gameState) 
     = case (stones, losingState) of
-    ([], True) -> pictures [background, levelmap grid, player_, gameOver]
-    ([], False) -> pictures [background, levelmap grid', player_, winningMessage]
+    ([], True) -> pictures [background, levelmap grid, player_]
+    ([], False) -> pictures [background, levelmap grid', player_]
     (_, _) -> pictures [background, levelmap grid, player_, rollingStones]
     where
         fgcolor = getForegroundColor theme
         player_ = playerSprite theme player
-        gameOver = translate 200 (-400) $ Text "Game Over"
-        winningMessage = translate 200 (-400) $ Text "You win!" -- replace 
-        -- with change to next level 
         rollingStones = translate 0 (-600) (renderStones theme stones)
         grid' = changeCell (15, 6) Portal grid
         background = screenBackground theme

@@ -22,15 +22,12 @@ renderBalls theme ((x, y) : ns) = ballPicture <> renderBalls theme ns
 drawLv4 :: State ([Ball], Int) -> Picture
 drawLv4 (State theme grid player (balls, _) losingState _)
     = case (balls, losingState) of
-    ([], True)  -> pictures [background, levelmap grid, player_, gameOver]
-    ([], False) -> pictures [background, levelmap grid, player_, winningMessage]
+    ([], True)  -> pictures [background, levelmap grid, player_]
+    ([], False) -> pictures [background, levelmap grid, player_]
     (_, _)      -> pictures [background, levelmap grid, player_, floatingBalls]
     where
         player_ = playerSprite theme player
         floatingBalls = renderBalls theme balls
-        gameOver = translate 200 (-400) $ Text "Game Over"
-        winningMessage = translate 200 (-400) $ Text "You win!" -- replace 
-        -- with change to next level 
         background = screenBackground theme
         levelmap = getLevelMap theme
 
@@ -58,14 +55,9 @@ decreaseBallPositions = map decreaseBall
 intersectsWithPlayer :: Player -> Ball -> Bool
 intersectsWithPlayer (x, y, _, _) (x0, y0) = flag
     where
-        -- ball's x-coordinate ranges from x0 to x0 + 50 
-        -- player's x-coordinate ranges from x to x + 100 
-        -- likewise for the y-coordinates 
-        -- they intersect of both the x-coordinate and 
-        -- y-coordinates intersect 
-        x' = min (x + 100) (x0 + 50) - max x x0
+        x' = min (x + 80) (x0 + 50) - max x x0
         y' = min (y + 100) (y0 + 50) - max y y0
-        flag = x' >= 1 && y' >= 1
+        flag = (x' > 0 && y' > 0)
 
 removeTouchingBall :: Player -> Ball -> [Ball]
 removeTouchingBall player ball
@@ -80,12 +72,10 @@ removeBallsPlayerTouches player (n : ns) = removeTouchingBall player n
 
 -- | Update the worlds based on time passed
 updateWorld :: Float -> State ([Ball], Int) -> State ([Ball], Int)
-updateWorld _ (State theme grid player ([], counter) losingState gameState)
-    = State theme grid player ([], counter) losingState gameState
-updateWorld _ (State theme grid player a losingState Paused)
-    = State theme grid player a losingState Paused
-updateWorld _ (State theme grid player a losingState Over)
-    = State theme grid player a losingState Over    
+updateWorld _ currentState@(State _ _ _ _ _ Over)
+    = currentState
+updateWorld _ currentState@(State _ _ _ _ _ Paused)
+    = currentState 
 updateWorld t (State theme grid player (balls, counter) losingState gameState)
     = case (ballTouchesBlock', counter >= 2900) of
     (False, True) -> State theme grid player ([], counter) False Completed  
