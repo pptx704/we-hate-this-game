@@ -93,6 +93,7 @@ applyGravity (x, y, m, ToUp v t) grid = player'
 movePlayer :: Player -> [[Block]] -> Player
 movePlayer player grid = applyGravity (moveToSide player grid) grid
 
+-- | Update the game state based on player movement and inputs
 updateStates :: State a -> State a
 updateStates state@(State theme grid player stateVar winningState gameState)
     = case gameState of
