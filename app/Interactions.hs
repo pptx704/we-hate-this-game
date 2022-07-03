@@ -84,6 +84,7 @@ applyGravity (x, y, m, ToUp v t) grid = player'
         d = if v' < 0 then ToDown 0 0.1 else ToUp v' (t+0.1)
         v' = v - 0.02 * t
 
+
 -- | Player movement is Side moves + jump moves
 movePlayer :: Player -> [[Block]] -> Player
 movePlayer player grid = applyGravity (moveToSide player grid) grid
