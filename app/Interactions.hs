@@ -65,10 +65,10 @@ moveToSide player@(x, y, m, j) grid =
         upperSideCell b1 b2 c = cellCoordToType (b1+c,b2) grid
         lowerSideCell b1 b2 c = cellCoordToType (b1+c, b2+50) grid
 
+
 -- | Checks if player is out of window
 playerOutOfScreen :: Player -> Bool
 playerOutOfScreen (x, y, _, _) = x+30 < 0 || x-30 > 1600 || y-50 > 0 || y+150 < -900
-
 
 -- | Deals with jumping and gravity
 applyGravity :: Player -> [[Block]] -> Player

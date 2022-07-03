@@ -67,4 +67,3 @@ game3 :: Theme -> IO()
 game3 theme = play window black 90
         (State theme lv3 (200, -600, Still, ToDown 0 1) ((750, -700), True) True)
         (drawWorld drawLv3) handleWorld updateWorld
-
