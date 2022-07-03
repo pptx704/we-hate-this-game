@@ -20,19 +20,17 @@ renderBalls theme ((x, y) : ns) = ballPicture <> renderBalls theme ns
         ball = translate 0 60 (circleSolid 30) 
 
 drawLv4 :: State ([Ball], Int) -> Picture
-drawLv4 (State theme grid player (balls, _) losingState)
+drawLv4 (State theme grid player (balls, _) losingState _)
     = case (balls, losingState) of
-    ([], True)  -> pictures [background, levelmap grid, player_, losingMessage]
+    ([], True)  -> pictures [background, levelmap grid, player_, gameOver]
     ([], False) -> pictures [background, levelmap grid, player_, winningMessage]
     (_, _)      -> pictures [background, levelmap grid, player_, floatingBalls]
     where
-        fgcolor = getForegroundColor theme
         player_ = playerSprite theme player
         floatingBalls = renderBalls theme balls
-        winningMessage = translate 200 (-400)
-            (color fgcolor (scale 1.5 1.5 (Text "YOU WIN!")))
-        losingMessage = translate 200 (-400)
-            (color fgcolor (scale 1.5 1.5 (Text "YOU LOSE")))
+        gameOver = translate 200 (-400) $ Text "Game Over"
+        winningMessage = translate 200 (-400) $ Text "You win!" -- replace 
+        -- with change to next level 
         background = screenBackground theme
         levelmap = getLevelMap theme
 
@@ -82,12 +80,16 @@ removeBallsPlayerTouches player (n : ns) = removeTouchingBall player n
 
 -- | Update the worlds based on time passed
 updateWorld :: Float -> State ([Ball], Int) -> State ([Ball], Int)
-updateWorld _ (State theme grid player ([], counter) losingState)
-    = State theme grid player ([], counter) losingState
-updateWorld t (State theme grid player (balls, counter) losingState)
+updateWorld _ (State theme grid player ([], counter) losingState gameState)
+    = State theme grid player ([], counter) losingState gameState
+updateWorld _ (State theme grid player a losingState Paused)
+    = State theme grid player a losingState Paused
+updateWorld _ (State theme grid player a losingState Over)
+    = State theme grid player a losingState Over    
+updateWorld t (State theme grid player (balls, counter) losingState gameState)
     = case (ballTouchesBlock', counter >= 2900) of
-    (False, True) -> State theme grid player ([], counter) False
-    (True, _)     -> State theme grid player ([], counter) True
+    (False, True) -> State theme grid player ([], counter) False Completed  
+    (True, _)     -> State theme grid player ([], counter) True Over 
     (_, _)        -> newState -- add more balls to the screen 
     where
         ballTouchesBlock' = ballTouchesBlock balls
@@ -96,12 +98,11 @@ updateWorld t (State theme grid player (balls, counter) losingState)
         ycoord x = (fromIntegral x * 100.0, -200.0)
         moreBalls = map ycoord (generateXCoord counter (counter `mod` 300)) -- all the new balls 
         -- start from the same y-coordinate 
+
         player' = movePlayer player grid
         newState = State theme grid player' (updatedBalls ++ moreBalls, counter + 1) losingState
+            gameState
 
--- | If an specialkey (arrows for now) is pressed then generalized
--- movement function is called
-handleWorld :: Event -> State ([Ball], Int) -> State ([Ball], Int)
 handleWorld (EventKey (SpecialKey k) pos sp _) state
     = applyMovement k pos sp state
 
@@ -113,5 +114,5 @@ game4 theme = do
     gen <- newStdGen
     play window black 70
         (State theme lv4 (200, -600, Still, ToDown 0 0) 
-            (map (\x -> (x*100, -200)) $ take 3 $ randomRs (2, 10) gen, 0) False)
+            (map (\x -> (x * 100, -200)) $ take 3 $ randomRs (2, 10) gen, 0) False Resumed)
         (drawWorld drawLv4) handleWorld updateWorld

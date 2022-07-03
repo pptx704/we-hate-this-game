@@ -42,18 +42,17 @@ renderStones theme (n : ns)
 -- | OG world drawing function
 -- if there is no stone then there is a result. Else game goes on
 drawLv6 :: State [Stone] -> Picture
-drawLv6 (State theme grid player stones losingState) 
+drawLv6 (State theme grid player stones losingState gameState) 
     = case (stones, losingState) of
-    ([], True) -> pictures [background, levelmap grid, player_, losingMessage]
+    ([], True) -> pictures [background, levelmap grid, player_, gameOver]
     ([], False) -> pictures [background, levelmap grid', player_, winningMessage]
     (_, _) -> pictures [background, levelmap grid, player_, rollingStones]
     where
         fgcolor = getForegroundColor theme
         player_ = playerSprite theme player
-        winningMessage = translate 250 (-400)
-            (color fgcolor (scale 1.5 1.5 (Text "YOU WIN!")))
-        losingMessage = translate 250 (-400)
-            (color fgcolor (scale 1.5 1.5 (Text "YOU LOSE")))
+        gameOver = translate 200 (-400) $ Text "Game Over"
+        winningMessage = translate 200 (-400) $ Text "You win!" -- replace 
+        -- with change to next level 
         rollingStones = translate 0 (-600) (renderStones theme stones)
         grid' = changeCell (15, 6) Portal grid
         background = screenBackground theme
@@ -65,16 +64,14 @@ handleWorld :: Event -> State [Stone] -> State [Stone]
 handleWorld (EventKey (Char char) Down _ _)
     (State theme grid player 
         initial@((_, _, _, firstCharacter) : remStones) 
-        losingState) = newState
+        losingState gameState) = newState
     where
         matches = char == firstCharacter
         newState = if matches then
-            State theme grid player remStones losingState else
-            State theme grid player initial losingState
+            State theme grid player remStones losingState gameState else
+            State theme grid player initial losingState gameState
 
 
--- | If an specialkey (arrows for now) is pressed then generalized
--- movement function is called
 handleWorld (EventKey (SpecialKey k) pos sp _) state
     = applyMovement k pos sp state
     
@@ -92,24 +89,27 @@ touchesPlayer _ _ = True
 
 -- | Update the worlds based on time passed
 updateWorld :: Float -> State [Stone] -> State [Stone]
-updateWorld _ currentState@(State _ _ _ [] _) 
+updateWorld _ currentState@(State _ _ _ [] _ _) 
     = currentState
-updateWorld t (State theme grid player stones losingState) = newState
+updateWorld _ currentState@(State _ _ _ _ _ Over)
+    = currentState
+updateWorld _ currentState@(State _ _ _ _ _ Paused)
+    = currentState
+updateWorld t (State theme grid player stones losingState gameState) = newState
     where
         lostGame = touchesPlayer stones player
         newStonesLoc = map (decreaseStone t) stones
         newState = if lostGame then
-            State theme grid player' [] True else
-            State theme grid player' newStonesLoc losingState    
+            State theme grid player' [] True Over else
+            State theme grid player' newStonesLoc losingState gameState
         player' = movePlayer player grid
-
         
-
 -- make the theme global later, somehow?
 -- data State [Stone] = State Theme [[Block]] Player [Stone] Bool
 game6 :: Theme -> IO ()
 game6 theme = do
     gen <- newStdGen
     play window black 90
-        (State theme lv6 (200, -600, Still, ToDown 0 0) (generateWorld (generateString gen) 700) False)
+        (State theme lv6 (200, -600, Still, ToDown 0 0) (generateWorld (generateString gen) 700) False
+            Resumed)
         (drawWorld drawLv6) handleWorld updateWorld
