@@ -14,6 +14,7 @@ data Block =
 data Theme = 
     DarkTheme 
     | LightTheme
+    deriving (Eq)
 
 -- | Player coordinate and movement direction
 type Player = (Float, Float, Movement, JumpDirection)

@@ -17,7 +17,7 @@ changeCellAtCol n f (x:xs) = x: changeCellAtCol (n-1) f xs
 changeCell :: (Int, Int) -> (Block -> Block) -> [[Block]] -> [[Block]]
 changeCell _ _ [] = [[]]
 changeCell (x, 0) func (g:gs) = changeCellAtCol x func g:gs
-changeCell (x, y) func (g:gs) = g : changeCell (x, y-1) func gs 
+changeCell (x, y) func (g:gs) = g : changeCell (x, y-1) func gs
 
 
 -- | The following two functions are used to find the type of a block
@@ -40,11 +40,14 @@ getCellPos :: (Float, Float) -> (Int, Int)
 getCellPos (x, y) = (div' (x+50) 100, abs $ div' (y+50) 100)
 
 
+cellCoordToType :: (Float, Float) -> [[Block]] -> Block
+cellCoordToType coord = getCellType (getCellPos coord)
+
 -- From a mouse position, determines the cell it has clicked on
 mouseToCell :: (Float, Float) -> (Int, Int)
 mouseToCell (x, y) = getCellPos (x+750, y-500)
 
--- 
+-- Moves player left or right
 moveToSide :: Player -> [[Block]] -> Player
 moveToSide player@(x, y, m, j) grid =
     case m of
@@ -52,44 +55,46 @@ moveToSide player@(x, y, m, j) grid =
         ToRight -> newPos (x, y) (x + movementCoeff, y) 30
         ToLeft -> newPos (x, y) (x - movementCoeff, y) (-30)
     where
-        newPos (a1, a2) (b1, b2) c 
+        newPos (a1, a2) (b1, b2) c
             = case (upperSideCell b1 b2 c, lowerSideCell b1 b2 c) of
             (Empty, Empty) -> (b1, b2, m, j)
             (Portal, Empty) -> (b1, b2, m, j)
             (Empty, Portal) -> (b1, b2, m, j)
             _ -> (a1, a2, m, j)
         movementCoeff = 2.0
-        upperSideCell b1 b2 c = getCellType (getCellPos (b1+c,b2)) grid
-        lowerSideCell b1 b2 c = getCellType (getCellPos (b1+c, b2+50)) grid
+        upperSideCell b1 b2 c = cellCoordToType (b1+c,b2) grid
+        lowerSideCell b1 b2 c = cellCoordToType (b1+c, b2+50) grid
 
-movePlayer :: Player -> [[Block]] -> Player
-movePlayer player grid = applyGravity (moveToSide player grid) grid
 
+-- | Deals with jumping and gravity
 applyGravity :: Player -> [[Block]] -> Player
 applyGravity (x, y, m, ToDown v t) grid = player'
     where
         player' = newPos (x, y) (x, y - v')
-        newPos (a1, a2) (b1, b2) = case getCellType (getCellPos (b1, b2-50)) grid of
+        newPos (a1, a2) (b1, b2) = case cellCoordToType (b1, b2-50) grid of
             Empty -> (b1, b2, m, ToDown v' (t+0.1))
             _ -> (a1, a2, m, ToDown 0 0.1)
         v' = v + 0.02 * t
 applyGravity (x, y, m, ToUp v t) grid = player'
     where
         player' = newPos (x, y) (x, y + v')
-        newPos (a1, a2) (b1, b2) = case getCellType (getCellPos (b1, b2+150)) grid of
+        newPos (a1, a2) (b1, b2) = case cellCoordToType (b1, b2+150) grid of
             Empty -> (b1, b2, m, d)
             _ -> (a1, a2, m, ToDown 0 0.1)
         d = if v' < 0 then ToDown 0 0.1 else ToUp v' (t+0.1)
         v' = v - 0.02 * t
 
--- | Generalized movement function. Checks if a the new grid position of the
--- player is a block or empty. If empty then player moves, else not.
-applyMovement :: SpecialKey -> KeyState -> Modifiers -> State a -> State a
--- Temporary applymovement for theme changing
+
+-- | Player movement is Side moves + jump moves
+movePlayer :: Player -> [[Block]] -> Player
+movePlayer player grid = applyGravity (moveToSide player grid) grid
+
+-- | Generalized function to deal with KeyPressing. 
+--- Apart from movement keys, it also deals with hotkeys
 -- Modifiers shift ctrl alt
+applyMovement :: SpecialKey -> KeyState -> Modifiers -> State a -> State a
 applyMovement KeySpace Down (Modifiers Down _ _) (State theme grid player stateVar losingState)
     = State (changeTheme theme) grid player stateVar losingState
-
 applyMovement k pos _ (State theme grid player@(x, y, d, j) stateVar losingState) =
     State theme grid player' stateVar losingState
     where

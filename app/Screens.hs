@@ -70,3 +70,15 @@ lv8 (usr, bull) =
 -- | Level 8 initial map
 lv8' :: [[Block]]
 lv8' = lv8 ([0,0,0,0], [0,0])
+
+
+-- | Level 3 map
+lv3 :: [[Block]]
+lv3 =  changeCell (15, 5) (const Empty) 
+    $ changeCell (15, 6) (const Portal) lv3'
+    where
+        holed = allBlock WallBlock 4 ++ allBlock Empty 8 
+            ++ allBlock WallBlock 4
+        lv3' = [allBlock WallBlock 16] 
+            ++ map (const borders) [1..6] 
+            ++ map (const holed) [0, 1]
