@@ -117,3 +117,11 @@ lv7 = changeCell (8, 3) (NumberedBlock 0) lv7'
         map (const borders) [1..4] ++
         map (\_ ->  WallBlock : allBlock Empty 15) [0, 1] ++
         map (const holed) [1..4]
+
+-- | Map for level 4
+lv4 :: [[Block]]
+lv4 =
+    [allBlock WallBlock 16] ++
+    map (const borders) [1..4] ++
+    map (\_ ->  WallBlock : allBlock Empty 15) [0, 1] ++
+    map (\_ -> allBlock WallBlock 16) [0, 1]

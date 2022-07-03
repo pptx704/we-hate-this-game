@@ -11,7 +11,7 @@ changeTheme DarkTheme = LightTheme
 -- | The following two functions are used to change a block from it's index
 changeCellAtCol :: Int -> Block -> [Block] -> [Block]
 changeCellAtCol _ _ [] = []
-changeCellAtCol 0 b (x:xs) = b:xs
+changeCellAtCol 0 b (_:xs) = b:xs
 changeCellAtCol n b (x:xs) = x: changeCellAtCol (n-1) b xs
 
 changeCell :: (Int, Int) -> Block -> [[Block]] -> [[Block]]
