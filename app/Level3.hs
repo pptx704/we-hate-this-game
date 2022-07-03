@@ -27,8 +27,8 @@ drawLv3 (State theme grid player ((x, y), caged) _) =
 
 -- | If an specialkey (arrows for now) is pressed then generalized
 -- movement function is called
-handleWorld :: Event -> State Balloon -> State Balloon
-handleWorld
+handleWorld3 :: Event -> State Balloon -> State Balloon
+handleWorld3
     (EventKey (SpecialKey KeySpace) Down (Modifiers Down _ _) _)
     (State theme grid player (coord, True) w)
     = State theme' grid player (coord, newState) w
@@ -36,13 +36,13 @@ handleWorld
         theme' = changeTheme theme
         newState = theme /= DarkTheme
 
-handleWorld (EventKey (SpecialKey k) pos sp _) state
+handleWorld3 (EventKey (SpecialKey k) pos sp _) state
     = applyMovement k pos sp state
 -- | For every other case, world is as is
-handleWorld _ state = state
+handleWorld3 _ state = state
 
-updateWorld :: Float -> State Balloon -> State Balloon
-updateWorld _ (State theme grid player ((x', y'), caged) winningState) = newState
+updateWorld3 :: Float -> State Balloon -> State Balloon
+updateWorld3 _ (State theme grid player ((x', y'), caged) winningState) = newState
     where
         newState = State theme grid player' (coords, caged) winningState
         player'' = movePlayer player grid
@@ -66,4 +66,4 @@ updateWorld _ (State theme grid player ((x', y'), caged) winningState) = newStat
 game3 :: Theme -> IO()
 game3 theme = play window black 90
         (State theme lv3 (200, -600, Still, ToDown 0 1) ((750, -700), True) True)
-        (drawWorld drawLv3) handleWorld updateWorld
+        (drawWorld drawLv3) handleWorld3 updateWorld3

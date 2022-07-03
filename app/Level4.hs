@@ -6,13 +6,11 @@ import Screens
 import WeHateThisGame
 import Interactions
 import System.Random
-import Data.Fixed (div')
 
 -- you have to continue hitting the balls without 
 -- letting any touch the ground for 30? seconds 
 
 type Ball = (Float, Float)
-type Counter = Int
 
 renderBalls :: Theme -> [Ball] -> Picture
 renderBalls _ []            = blank
@@ -21,7 +19,7 @@ renderBalls theme ((x, y) : ns) = ballPicture <> renderBalls theme ns
         ballPicture = translate x y (color (getForegroundColor theme) ball)
         ball = translate 0 60 (circleSolid 30) 
 
-drawLv4 :: State ([Ball], Counter) -> Picture
+drawLv4 :: State ([Ball], Int) -> Picture
 drawLv4 (State theme grid player (balls, _) losingState)
     = case (balls, losingState) of
     ([], True)  -> pictures [background, levelmap grid, player_, losingMessage]
@@ -46,10 +44,10 @@ ballTouchesBlock ((_, y) : balls) = (y <= -680) || ballTouchesBlock balls
 -- | Generates random x-coordinates 
 generateXCoord :: Int -> Int -> [Int]
 generateXCoord time x
-    | x == 0    = take 4 $ randomRs (2, 10) gen
+    | x == 0    = take 4 rs
     | otherwise = []
     where
-        gen = mkStdGen $ div' (pi * fromIntegral time) 1 -- fix gen for randomness
+        rs = randomRs (2, 10) $ mkStdGen time
 
 -- | Decreases the y-coordinate of a ball 
 decreaseBall :: Ball -> Ball
@@ -58,8 +56,6 @@ decreaseBall (x, y) = (x, y - 0.3)
 -- | Decreases the y-coordinate of a list of balls
 decreaseBallPositions :: [Ball] -> [Ball]
 decreaseBallPositions = map decreaseBall
-
-ycoord x = (fromIntegral x * 100.0, -200.0)
 
 intersectsWithPlayer :: Player -> Ball -> Bool
 intersectsWithPlayer (x, y, _, _) (x0, y0) = flag
@@ -85,7 +81,7 @@ removeBallsPlayerTouches player (n : ns) = removeTouchingBall player n
     ++ removeBallsPlayerTouches player ns
 
 -- | Update the worlds based on time passed
-updateWorld :: Float -> State ([Ball], Counter) -> State ([Ball], Counter)
+updateWorld :: Float -> State ([Ball], Int) -> State ([Ball], Int)
 updateWorld _ (State theme grid player ([], counter) losingState)
     = State theme grid player ([], counter) losingState
 updateWorld t (State theme grid player (balls, counter) losingState)
@@ -97,6 +93,7 @@ updateWorld t (State theme grid player (balls, counter) losingState)
         ballTouchesBlock' = ballTouchesBlock balls
         remainingBalls = removeBallsPlayerTouches player balls
         updatedBalls = decreaseBallPositions remainingBalls
+        ycoord x = (fromIntegral x * 100.0, -200.0)
         moreBalls = map ycoord (generateXCoord counter (counter `mod` 300)) -- all the new balls 
         -- start from the same y-coordinate 
         player' = movePlayer player grid
@@ -104,6 +101,7 @@ updateWorld t (State theme grid player (balls, counter) losingState)
 
 -- | If an specialkey (arrows for now) is pressed then generalized
 -- movement function is called
+handleWorld :: Event -> State ([Ball], Int) -> State ([Ball], Int)
 handleWorld (EventKey (SpecialKey k) pos sp _) state
     = applyMovement k pos sp state
 
@@ -111,6 +109,9 @@ handleWorld (EventKey (SpecialKey k) pos sp _) state
 handleWorld _ state = state
 
 game4 :: Theme -> IO()
-game4 theme = play window black 70
-        (State theme lv4 (200, -600, Still, ToDown 0 0) ([(200, -200)], 0) False)
+game4 theme = do
+    gen <- newStdGen
+    play window black 70
+        (State theme lv4 (200, -600, Still, ToDown 0 0) 
+            (map (\x -> (x*100, -200)) $ take 3 $ randomRs (2, 10) gen, 0) False)
         (drawWorld drawLv4) handleWorld updateWorld

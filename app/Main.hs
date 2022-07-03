@@ -1,9 +1,11 @@
 module Main where
+import Level0
 import Level6
 import Level8
 import Level3
 import Level7
 import Level5
+import Level4
 
 import WeHateThisGame
 -- import Assets (getBackgroundColor)
