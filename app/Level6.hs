@@ -55,7 +55,7 @@ drawLv6 (State theme grid player stones losingState)
         losingMessage = translate 250 (-400)
             (color fgcolor (scale 1.5 1.5 (Text "YOU LOSE")))
         rollingStones = translate 0 (-600) (renderStones theme stones)
-        grid' = changeCell (15, 6) (const Portal) grid
+        grid' = changeCell (15, 6) Portal grid
         background = screenBackground theme
         levelmap = getLevelMap theme
 

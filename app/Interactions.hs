@@ -9,15 +9,15 @@ changeTheme LightTheme = DarkTheme
 changeTheme DarkTheme = LightTheme
 
 -- | The following two functions are used to change a block from it's index
-changeCellAtCol :: Int -> (Block -> Block) -> [Block] -> [Block]
+changeCellAtCol :: Int -> Block -> [Block] -> [Block]
 changeCellAtCol _ _ [] = []
-changeCellAtCol 0 f (x:xs) = f x:xs
-changeCellAtCol n f (x:xs) = x: changeCellAtCol (n-1) f xs
+changeCellAtCol 0 b (x:xs) = b:xs
+changeCellAtCol n b (x:xs) = x: changeCellAtCol (n-1) b xs
 
-changeCell :: (Int, Int) -> (Block -> Block) -> [[Block]] -> [[Block]]
+changeCell :: (Int, Int) -> Block -> [[Block]] -> [[Block]]
 changeCell _ _ [] = [[]]
-changeCell (x, 0) func (g:gs) = changeCellAtCol x func g:gs
-changeCell (x, y) func (g:gs) = g : changeCell (x, y-1) func gs
+changeCell (x, 0) b (g:gs) = changeCellAtCol x b g:gs
+changeCell (x, y) b (g:gs) = g : changeCell (x, y-1) b gs
 
 
 -- | The following two functions are used to find the type of a block
@@ -64,6 +64,10 @@ moveToSide player@(x, y, m, j) grid =
         movementCoeff = 2.0
         upperSideCell b1 b2 c = cellCoordToType (b1+c,b2) grid
         lowerSideCell b1 b2 c = cellCoordToType (b1+c, b2+50) grid
+
+-- | Checks if player is out of window
+playerOutOfScreen :: Player -> Bool
+playerOutOfScreen (x, y, _, _) = x+30 < 0 || x-30 > 1600 || y-50 > 0 || y+150 < -900
 
 
 -- | Deals with jumping and gravity
