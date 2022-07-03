@@ -85,9 +85,9 @@ updateWorld _ (State theme grid player state winningState) = newState
         player' = movePlayer player grid'
         --grid = lv8 (usr, bulls)
         grid' = if winningState then
-                changeCell (15, 6) (const Portal) grid''
+                changeCell (15, 6) Portal grid''
                 else grid
-        grid'' = changeCell (15, 5) (const Empty) grid
+        grid'' = changeCell (15, 5) Empty grid
 
 
 -- | Game function

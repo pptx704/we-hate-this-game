@@ -43,6 +43,12 @@ allBlock block n = map (const block) [1 .. n]
 borders :: [Block]
 borders = [WallBlock] ++ allBlock Empty 14 ++ [WallBlock]
 
+
+-- | The holed rows
+holed :: [Block]
+holed = allBlock WallBlock 4 ++ allBlock Empty 8 
+            ++ allBlock WallBlock 4
+
 -- | Map for level 6
 lv6 :: [[Block]]
 lv6 =
@@ -74,11 +80,27 @@ lv8' = lv8 ([0,0,0,0], [0,0])
 
 -- | Level 3 map
 lv3 :: [[Block]]
-lv3 =  changeCell (15, 5) (const Empty) 
-    $ changeCell (15, 6) (const Portal) lv3'
+lv3 =  changeCell (15, 5) Empty 
+    $ changeCell (15, 6) Portal lv3'
     where
-        holed = allBlock WallBlock 4 ++ allBlock Empty 8 
-            ++ allBlock WallBlock 4
         lv3' = [allBlock WallBlock 16] 
             ++ map (const borders) [1..6] 
             ++ map (const holed) [0, 1]
+
+-- | Level 5
+lv5 :: [[Block]]
+lv5 = changeCell (15, 6) Portal lv5'
+    where
+    lv5' = [allBlock WallBlock 16] ++
+     map (const borders) [1..4] ++
+     map (\_ ->  WallBlock : allBlock Empty 15) [0, 1] ++
+     map (const holed) [1..4]
+
+-- | Level 7
+lv7 :: [[Block]]
+lv7 = changeCell (8, 3) (NumberedBlock 0) lv7'
+    where
+    lv7' = [allBlock WallBlock 16] ++
+        map (const borders) [1..4] ++
+        map (\_ ->  WallBlock : allBlock Empty 15) [0, 1] ++
+        map (const holed) [1..4]
