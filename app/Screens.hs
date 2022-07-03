@@ -49,6 +49,19 @@ holed :: [Block]
 holed = allBlock WallBlock 4 ++ allBlock Empty 8 
             ++ allBlock WallBlock 4
 
+
+lv0 :: [[Block]]
+lv0 = changeCell (15, 6) Portal lv0'
+    where
+        lv0' =
+            [allBlock WallBlock 16] ++
+            map (const borders) [1..4] ++
+            map (\_ ->  WallBlock : allBlock Empty 15) [0, 1] ++
+            map (const smallHole) [1..4]
+        smallHole = allBlock WallBlock 7 ++ allBlock Empty 2
+                    ++ allBlock WallBlock 7
+            
+            
 -- | Map for level 6
 lv6 :: [[Block]]
 lv6 =
