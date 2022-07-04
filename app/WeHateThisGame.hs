@@ -7,7 +7,7 @@ data Block =
     | WallBlock 
     | NumberedBlock Int
     | Portal
-    deriving Show
+    deriving (Show, Eq)
 
 -- | There are two themes, dark and light
 -- Dark themes have grey foreground and white background, vice versa for light

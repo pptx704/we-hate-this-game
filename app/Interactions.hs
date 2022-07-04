@@ -91,15 +91,23 @@ applyGravity (x, y, m, ToUp v t) grid = player'
 movePlayer :: Player -> [[Block]] -> Player
 movePlayer player grid = applyGravity (moveToSide player grid) grid
 
+
+-- | Checks if user reaches the portal
+reachesPortal :: Player -> Bool
+reachesPortal (x, y, _, _) = x >= 1460 && x <= 1540 
+    && y <= -550  && y >= -650
+
 -- | Update the game state based on player movement and inputs
 updateStates :: State a -> State a
 updateStates state@(State theme grid player stateVar winningState gameState)
     = case gameState of
         Over -> state
         Paused -> state
+        Completed -> state
         _ -> State theme grid' player' stateVar winningState gs
     where
-        gs = if playerOutOfScreen player' then Over else gameState
+        gs = if playerOutOfScreen player' then Over else gs''
+        gs'' = if reachesPortal player' then Completed else gameState
         player' = movePlayer player grid
         grid' = if winningState then grid'' else grid
         grid'' = changeCell (15, 5) Empty $ changeCell (15, 6) Portal grid

@@ -46,7 +46,7 @@ numberedBlock t a
     where
         fgcolor = getForegroundColor t
 
--- 
+-- Draws blocks of different types
 drawBlock :: Theme -> Block -> Picture
 drawBlock _ Empty = blank
 drawBlock t WallBlock = wallBlock t
@@ -65,10 +65,9 @@ portal = portal' [4, 16 .. 40] yellow
 -- Player is a static image for now. marker
 -- Maybe it will animate in the final submission
 playerSprite :: Theme -> Player -> Picture
-playerSprite theme (x, y, _, _) = translate x y (pictures [head_, body, hands, legs, marker])
+playerSprite theme (x, y, _, _) = translate x y (pictures [head_, body, hands, legs])
     where
         fgcolor = getForegroundColor theme
-        -- additional _ to seperate from head function
         head_ = translate 0 120 (color fgcolor (circleSolid 17.5))
         body = translate 0 60 (color fgcolor (rectangleSolid 8 85))
         hands = translate 0 60 (leftHand <> rightHand)
@@ -79,7 +78,6 @@ playerSprite theme (x, y, _, _) = translate x y (pictures [head_, body, hands, l
         leg' = color fgcolor (rectangleSolid 5 70)
         leftLeg = translate (-5) 0 (rotate 5 leg')
         rightLeg = translate 5 0 (rotate (-5) leg')
-        marker = color red $ circleSolid 2 -- temporary to detect player coordinate
 
 -- Cage for pptx704's balloon lvl
 cage :: Theme -> Picture
@@ -97,10 +95,10 @@ cage theme = color (getForegroundColor theme) frame
 rollingStone :: Theme -> Picture
 rollingStone theme = color (getForegroundColor theme) (thickCircle 42.5 10)
 
--- Picture of a balloon for pptx704
+-- Picture of a balloon for level 3
 balloon :: Theme -> Picture 
-balloon t = circle_ <> color red ( wire <> circleSolid 1)
+balloon t = color (getForegroundColor t) (circle_ <> wire)
     where 
         -- _ to differentiate from circle
-        circle_ = color (getForegroundColor t) $ circleSolid 45
+        circle_ = circleSolid 45
         wire = translate 0 (-195) $ rectangleSolid 2 300

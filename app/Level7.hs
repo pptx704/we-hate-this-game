@@ -18,13 +18,12 @@ handleWorld7 _ state = state
 -- | Update world needs overwriting some portion of generalized
 -- movements because we need to count the deaths
 updateWorld7 :: Float -> State Int -> State Int
-updateWorld7 _ st@(State theme grid _ state _ gameState) = newState
+updateWorld7 _ st@(State theme grid _ state winningState gameState) = newState
     where
-        newState = State theme grid' player' state' winningState' gameState
-        winningState' = state == 5
+        newState = State theme grid player' state' winningState gameState'
+        gameState' = if state == 5 then Completed else gameState
         player' = fst $ getNewState (player'', state)
         state' = snd $ getNewState (player'', state)
-        grid' = changeCell (8, 3) (NumberedBlock state') grid
         player'' = getPlayer (updateStates st)
         getNewState (p, s) = if playerOutOfScreen p then ((200, -600, Still, ToDown 0 1), s+1)
             else (p, s)

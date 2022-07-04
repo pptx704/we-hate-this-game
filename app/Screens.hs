@@ -18,9 +18,9 @@ drawWorld drawFunc state@(State theme grid player _ _ gameState)
     where
         message = color (getForegroundColor theme) message'
         message' = case gameState of
-            Over -> Text "Game Over"
-            Paused -> Text "Paused"
-            Completed -> Text "You Win!"
+            Over -> translate 450 (-400) $ Text "Game Over"
+            Paused -> translate 450 (-400) $ Text "Paused"
+            Completed -> translate 450 (-400) $ Text "You Win!"
             _ -> blank
         background = screenBackground theme
         player' = playerSprite theme player
@@ -116,9 +116,7 @@ lv5 = [allBlock WallBlock 16] ++
 
 -- | Level 7
 lv7 :: [[Block]]
-lv7 = changeCell (8, 3) (NumberedBlock 0) lv7'
-    where
-    lv7' = [allBlock WallBlock 16] ++
+lv7 = [allBlock WallBlock 16] ++
         map (const borders) [1..4::Int] ++
         map (\_ ->  WallBlock : allBlock Empty 15) [0, 1::Int] ++
         map (const holed) [1..4::Int]
