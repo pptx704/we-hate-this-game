@@ -118,12 +118,12 @@ updateStates state@(State theme grid player stateVar winningState gameState)
 getNewLevel :: State -> State
 getNewLevel state@(State theme _ _ lv _ _) =
     case lv of
-        Lv0 _ -> State theme lv3 (200, -600, Still, ToDown 0 1) (Lv3 ((750, -700), True)) True Resumed
+        Lv0 -> State theme lv3 (200, -600, Still, ToDown 0 1) (Lv3 ((750, -700), True)) True Resumed
         Lv3 _ -> State theme lv4 (200, -600, Still, ToDown 0 0.1)
             (Lv4 (map (\x -> (x * 100, -200)) $ take 3
             $ randomRs (2, 10) gen, 0)) False Resumed
-        Lv4 _ -> State theme lv5 (200, -600, Still, ToDown 0 1) (Lv5 Empty) True Resumed
-        Lv5 _ -> State theme lv6 (200, -600, Still, ToDown 0 0)
+        Lv4 _ -> State theme lv5 (200, -600, Still, ToDown 0 1) Lv5 True Resumed
+        Lv5 -> State theme lv6 (200, -600, Still, ToDown 0 0)
             (Lv6 (generateWorld generateString 700)) False Resumed
         Lv6 _ -> State theme lv7 (200, -600, Still, ToDown 0 1) (Lv7 0) True Resumed
         Lv7 _ -> State theme lv8' (200, -600, Still, ToDown 0 1) (Lv8 (generateWorld8, [0,0,0,0])) False Resumed

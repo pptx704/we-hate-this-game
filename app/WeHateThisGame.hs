@@ -44,7 +44,7 @@ data State = State {
     getGameState :: GameState
 }
 -- | Wrappers for each level to generalize all level states 
-data LevelState = Lv0 Block | Lv3 Balloon | Lv4 ([Ball], Int) | Lv5 Block
+data LevelState = Lv0 | Lv3 Balloon | Lv4 ([Ball], Int) | Lv5
     | Lv6 [Stone] | Lv7 Int | Lv8 ([Int], [Int])
 
 -- | Keeps track of the current game state

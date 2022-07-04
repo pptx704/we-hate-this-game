@@ -17,6 +17,7 @@ handleWorld7 _ state = state
 -- | Update world needs overwriting some portion of generalized
 -- movements because we need to count the deaths
 updateWorld7 :: Float -> State -> State
+updateWorld7 _ st@(State _ _ _ (Lv7 _) _ Completed) = updateStates st
 updateWorld7 _ st@(State theme grid _ (Lv7 state) winningState gameState) = newState
     where
         newState = State theme grid player' (Lv7 state') winningState gameState'
