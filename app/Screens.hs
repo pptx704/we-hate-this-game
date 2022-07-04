@@ -71,8 +71,7 @@ lv0 = [allBlock WallBlock 16] ++
     where
         smallHole = allBlock WallBlock 7 ++ allBlock Empty 2
             ++ allBlock WallBlock 7
-            
-            
+
 -- | Map for level 6
 lv6 :: [[Block]]
 lv6 = [allBlock WallBlock 16] ++

@@ -5,6 +5,8 @@ import Screens
 import WeHateThisGame
 import Graphics.Gloss.Interface.IO.Game
 
+-- | This was used to differentiate Lv5 and Lv0 while trying to connect levels
+-- that attempt was futile
 newtype Lv5Type = Lv5Type Block
 
 -- | No level specific graphics

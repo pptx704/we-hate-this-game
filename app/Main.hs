@@ -52,5 +52,3 @@ main = do
     putStrLn $
         "Let's play the low-effort graphical game " ++
         "that needs command line to start-"
-    runGame DarkTheme
-
