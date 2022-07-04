@@ -4,7 +4,6 @@ import Interactions
 import Screens
 import Assets
 import WeHateThisGame
-import System.Random
 import Graphics.Gloss.Interface.IO.Game
 import Data.List
 
@@ -47,8 +46,8 @@ drawLv8 (State theme grid player _ _ _) =
 
 -- | If the mouse button is pressed, then the mouse coordinate
 -- is used to change game state
-handleWorld :: Event -> State -> State
-handleWorld (EventKey (MouseButton LeftButton) Down _ coord)
+handleWorld8 :: Event -> State -> State
+handleWorld8 (EventKey (MouseButton LeftButton) Down _ coord)
     state@(State theme _ player (Lv8 (solution, usr)) _ gameState) =
         case gameState of
             Resumed -> State theme grid' player (Lv8 state') winningState gameState
@@ -69,12 +68,12 @@ handleWorld (EventKey (MouseButton LeftButton) Down _ coord)
 
 -- | If an specialkey (arrows for now) is pressed then generalized
 -- movement function is called
-handleWorld (EventKey (SpecialKey k) pos sp _) state
+handleWorld8 (EventKey (SpecialKey k) pos sp _) state
     = applyMovement k pos sp state
     
 -- | For every other case, world is as is
-handleWorld _ state = state
+handleWorld8 _ state = state
 
 -- Player movement is generalized
-updateWorld :: Float -> State -> State
-updateWorld _ = updateStates
+updateWorld8 :: Float -> State -> State
+updateWorld8 _ = updateStates

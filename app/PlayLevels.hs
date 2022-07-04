@@ -9,6 +9,7 @@ import Level3
 import Level6
 import Level4
 import Level7
+import Level8
 
 -- | General drawlevel function
 drawLevel :: State -> Picture
@@ -20,6 +21,7 @@ drawLevel state
         Lv5 _ -> drawLv5 state
         Lv6 _ -> drawLv6 state
         Lv7 _ -> drawLv7 state
+        Lv8 _ -> drawLv8 state
 
 -- | General level handler
 handleWorld :: Event -> State -> State
@@ -31,6 +33,7 @@ handleWorld event state
         Lv5 _ -> handleWorld5 event state
         Lv6 _ -> handleWorld6 event state
         Lv7 _ -> handleWorld7 event state
+        Lv8 _ -> handleWorld8 event state
 
 -- | General world updater
 updateWorld :: Float -> State -> State
@@ -42,6 +45,7 @@ updateWorld time state
         Lv5 _ -> updateWorld5 time state
         Lv6 _ -> updateWorld6 time state
         Lv7 _ -> updateWorld7 time state
+        Lv8 _ -> updateWorld8 time state
 
 -- | General game runner
 game :: IO ()
