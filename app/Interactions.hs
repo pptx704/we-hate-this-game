@@ -31,17 +31,15 @@ getCellType (x, 0) (g:_) = getCellAtCol x g
 getCellType (x, y) (_:gs) = getCellType (x, y - 1) gs
 getCellType _ [] = Empty
 
--- | changeCell and getCell can be merged or something??
-
 -- | Converts a coordinate to the cell inside the grid syste
 -- >>> getCellPos (250, -650)
 -- NOW (3,6)
 getCellPos :: (Float, Float) -> (Int, Int)
 getCellPos (x, y) = (div' (x+50) 100, abs $ div' (y+50) 100)
 
-
+-- | Gets the type of a cell from the coordinates
 cellCoordToType :: (Float, Float) -> [[Block]] -> Block
-cellCoordToType coord = getCellType (getCellPos coord)
+cellCoordToType = getCellType . getCellPos
 
 -- From a mouse position, determines the cell it has clicked on
 mouseToCell :: (Float, Float) -> (Int, Int)
@@ -99,10 +97,12 @@ updateStates state@(State theme grid player stateVar winningState gameState)
     = case gameState of
         Over -> state
         Paused -> state
-        _ -> State theme grid player' stateVar winningState gs
+        _ -> State theme grid' player' stateVar winningState gs
     where
         gs = if playerOutOfScreen player' then Over else gameState
         player' = movePlayer player grid
+        grid' = if winningState then grid'' else grid
+        grid'' = changeCell (15, 5) Empty $ changeCell (15, 6) Portal grid
 
 -- | Generalized function to deal with KeyPressing.
 -- Apart from movement keys, it also deals with hotkeys
@@ -114,9 +114,8 @@ applyMovement k Down (Modifiers Down _ _) state@(State theme grid player stateVa
         KeyUp -> State theme grid player stateVar winningState Paused
         KeyDown -> State theme grid player stateVar winningState Resumed
         _ -> state
-
-applyMovement k pos _ state@(State theme grid player@(x, y, d, j) stateVar winningState gameState) =
-    case gameState of
+applyMovement k pos _ state@(State theme grid player@(x, y, d, j) stateVar winningState gameState) 
+    = case gameState of
         Over -> state
         Paused -> state
         _ -> State theme grid player' stateVar winningState gameState

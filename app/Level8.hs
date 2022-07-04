@@ -53,8 +53,10 @@ drawLv8 (State theme grid player _ _ _) =
 -- is used to change game state
 handleWorld :: Event -> State ([Int], [Int]) -> State ([Int], [Int])
 handleWorld (EventKey (MouseButton LeftButton) Down _ coord)
-    (State theme _ player (solution, usr) _ gameState) =
-        State theme grid' player state' winningState gameState
+    state@(State theme _ player (solution, usr) _ gameState) =
+        case gameState of
+            Resumed -> State theme grid' player state' winningState gameState
+            _ -> state
         where
             cell = mouseToCell coord
             state' = (solution, changed)
@@ -77,21 +79,11 @@ handleWorld (EventKey (SpecialKey k) pos sp _) state
 -- | For every other case, world is as is
 handleWorld _ state = state
 
--- Updates player movement if required
+-- Player movement is generalized
 updateWorld :: Float -> State ([Int], [Int]) -> State ([Int], [Int])
-updateWorld _ (State theme grid player state winningState gameState) = newState
-    where
-        nextState = State theme grid' player state winningState gameState
-        -- player' = movePlayer player grid'   
-        --grid = lv8 (usr, bulls)
-        grid' = if winningState then
-                changeCell (15, 6) Portal grid''
-                else grid
-        grid'' = changeCell (15, 5) Empty grid
-        newState = updateStates nextState
+updateWorld _ = updateStates
 
 -- | Game function
--- data State = State Theme [[Block]] Player ([Int], [Int]) Bool
 game8 :: Theme -> IO()
 game8 theme = do
     gen <- newStdGen

@@ -25,25 +25,25 @@ drawLv3 (State theme grid player ((x, y), caged) _ _) =
         jb = drawBlock theme JumpingBlock
         jb2 = jb <> translate 100 0 jb
 
--- | If an specialkey (arrows for now) is pressed then generalized
--- movement function is called
-handleWorld3 :: Event -> State Balloon -> State Balloon
-handleWorld3
+-- | If theme is changed then handle level specific mechanism
+-- otherwise continues
+handleWorld :: Event -> State Balloon -> State Balloon
+handleWorld
     (EventKey (SpecialKey KeySpace) Down (Modifiers Down _ _) _)
     (State theme grid player (coord, True) w gs)
     = State theme' grid player (coord, newState) w gs
     where
         theme' = changeTheme theme
         newState = theme /= DarkTheme
-
-handleWorld3 (EventKey (SpecialKey k) pos sp _) state
+handleWorld (EventKey (SpecialKey k) pos sp _) state
     = applyMovement k pos sp state
-    
--- | For every other case, world is as is
-handleWorld3 _ state = state
+handleWorld _ state = state
 
-updateWorld3 :: Float -> State Balloon -> State Balloon
-updateWorld3 _ state = newState
+-- | Updates the world
+-- Change balloon position, applies level specific collision
+-- then applies general updateState
+updateWorld :: Float -> State Balloon -> State Balloon
+updateWorld _ state = newState
     where
         newState = objectGravity $ updateStates $ balloonUp state
         objectGravity st@(State t g (px, py, m, _) ((bx, by), c) w gs) = 
@@ -59,8 +59,7 @@ updateWorld3 _ state = newState
             _ -> (bx, by)
 
 -- | Game function
--- data State = State Theme [[Block]] Player Balloon Bool
 game3 :: Theme -> IO()
 game3 theme = play window black 90
         (State theme lv3 (200, -600, Still, ToDown 0 1) ((750, -700), True) True Resumed)
-        (drawWorld drawLv3) handleWorld3 updateWorld3
+        (drawWorld drawLv3) handleWorld updateWorld
