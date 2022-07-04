@@ -3,7 +3,6 @@ module Screens where
 import Graphics.Gloss
 import Assets
 import WeHateThisGame
-import Interactions (changeCell)
 
 -- | Game window 1600 x 900
 window :: Display
