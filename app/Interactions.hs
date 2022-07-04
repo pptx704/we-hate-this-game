@@ -11,7 +11,7 @@ changeTheme DarkTheme = LightTheme
 -- | The following two functions are used to change a block from it's index
 changeCellAtCol :: Int -> Block -> [Block] -> [Block]
 changeCellAtCol _ _ [] = []
-changeCellAtCol 0 b (x:xs) = b:xs
+changeCellAtCol 0 b (_:xs) = b:xs
 changeCellAtCol n b (x:xs) = x: changeCellAtCol (n-1) b xs
 
 changeCell :: (Int, Int) -> Block -> [[Block]] -> [[Block]]
@@ -31,17 +31,15 @@ getCellType (x, 0) (g:_) = getCellAtCol x g
 getCellType (x, y) (_:gs) = getCellType (x, y - 1) gs
 getCellType _ [] = Empty
 
--- | changeCell and getCell can be merged or something??
-
 -- | Converts a coordinate to the cell inside the grid syste
 -- >>> getCellPos (250, -650)
 -- NOW (3,6)
 getCellPos :: (Float, Float) -> (Int, Int)
 getCellPos (x, y) = (div' (x+50) 100, abs $ div' (y+50) 100)
 
-
+-- | Gets the type of a cell from the coordinates
 cellCoordToType :: (Float, Float) -> [[Block]] -> Block
-cellCoordToType coord = getCellType (getCellPos coord)
+cellCoordToType = getCellType . getCellPos
 
 -- From a mouse position, determines the cell it has clicked on
 mouseToCell :: (Float, Float) -> (Int, Int)
@@ -93,14 +91,42 @@ applyGravity (x, y, m, ToUp v t) grid = player'
 movePlayer :: Player -> [[Block]] -> Player
 movePlayer player grid = applyGravity (moveToSide player grid) grid
 
--- | Generalized function to deal with KeyPressing. 
---- Apart from movement keys, it also deals with hotkeys
+
+-- | Checks if user reaches the portal
+reachesPortal :: Player -> Bool
+reachesPortal (x, y, _, _) = x >= 1460 && x <= 1540 
+    && y <= -550  && y >= -650
+
+-- | Update the game state based on player movement and inputs
+updateStates :: State a -> State a
+updateStates state@(State theme grid player stateVar winningState gameState)
+    = case gameState of
+        Over -> state
+        Paused -> state
+        Completed -> state
+        _ -> State theme grid' player' stateVar winningState gs
+    where
+        gs = if playerOutOfScreen player' then Over else gs''
+        gs'' = if reachesPortal player' then Completed else gameState
+        player' = movePlayer player grid
+        grid' = if winningState then grid'' else grid
+        grid'' = changeCell (15, 5) Empty $ changeCell (15, 6) Portal grid
+
+-- | Generalized function to deal with KeyPressing.
+-- Apart from movement keys, it also deals with hotkeys
 -- Modifiers shift ctrl alt
 applyMovement :: SpecialKey -> KeyState -> Modifiers -> State a -> State a
-applyMovement KeySpace Down (Modifiers Down _ _) (State theme grid player stateVar losingState)
-    = State (changeTheme theme) grid player stateVar losingState
-applyMovement k pos _ (State theme grid player@(x, y, d, j) stateVar losingState) =
-    State theme grid player' stateVar losingState
+applyMovement k Down (Modifiers Down _ _) state@(State theme grid player stateVar winningState gameState)
+    = case k of
+        KeySpace -> State (changeTheme theme) grid player stateVar winningState gameState
+        KeyUp -> State theme grid player stateVar winningState Paused
+        KeyDown -> State theme grid player stateVar winningState Resumed
+        _ -> state
+applyMovement k pos _ state@(State theme grid player@(x, y, d, j) stateVar winningState gameState) 
+    = case gameState of
+        Over -> state
+        Paused -> state
+        _ -> State theme grid player' stateVar winningState gameState
     where
         player' = case (k, pos) of
             (KeyRight, Down) -> (x, y, ToRight, j)

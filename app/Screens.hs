@@ -7,11 +7,24 @@ import Interactions (changeCell)
 
 -- | Game window 1600 x 900
 window :: Display
-window = InWindow "Random window" (1600, 900) (100, 100)
+window = InWindow "We Hate This Game" (1600, 900) (10, 10)
 
--- | Gets the world generated on (0,0) and places it on top corner
+-- | Generates common world, embedds level specific world to it and then
+-- puts the drawing to topleft corner
 drawWorld :: (State a -> Picture) -> State a -> Picture
-drawWorld f a = translate (-750) 400 $ f a
+drawWorld drawFunc state@(State theme grid player _ _ gameState) 
+    = translate (-750) 400 $
+    pictures [background, levelmap grid, player', drawFunc state, message]
+    where
+        message = color (getForegroundColor theme) message'
+        message' = case gameState of
+            Over -> translate 450 (-400) $ Text "Game Over"
+            Paused -> translate 450 (-400) $ Text "Paused"
+            Completed -> translate 450 (-400) $ Text "You Win!"
+            _ -> blank
+        background = screenBackground theme
+        player' = playerSprite theme player
+        levelmap = getLevelMap theme
 
 -- | Gets the theme background
 screenBackground :: Theme -> Picture
@@ -49,21 +62,30 @@ holed :: [Block]
 holed = allBlock WallBlock 4 ++ allBlock Empty 8 
             ++ allBlock WallBlock 4
 
+-- | Map for level 0
+lv0 :: [[Block]]
+lv0 = [allBlock WallBlock 16] ++
+            map (const borders) [1..4::Int] ++
+            map (\_ ->  WallBlock : allBlock Empty 15) [0, 1::Int] ++
+            map (const smallHole) [0,1::Int]
+    where
+        smallHole = allBlock WallBlock 7 ++ allBlock Empty 2
+            ++ allBlock WallBlock 7
+
 -- | Map for level 6
 lv6 :: [[Block]]
-lv6 =
-    [allBlock WallBlock 16] ++
-    map (const borders) [1..4] ++
-    map (\_ ->  WallBlock : allBlock Empty 15) [0, 1] ++
-    map (\_ -> allBlock WallBlock 16) [0, 1]
+lv6 = [allBlock WallBlock 16] ++
+    map (const borders) [1..4::Int] ++
+    map (\_ ->  WallBlock : allBlock Empty 15) [0, 1::Int] ++
+    map (\_ -> allBlock WallBlock 16) [0, 1::Int]
 
 -- | Map generator for level 8
 -- Needs game states to draw the map
 lv8 :: ([Int], [Int]) -> [[Block]]
 lv8 (usr, bull) =
     [allBlock WallBlock 16, borders, bullrow, borders, usrrow]
-    ++ map (const borders) [0,1] ++
-    map (\_ -> allBlock WallBlock 16) [0, 1]
+    ++ map (const borders) [0,1::Int] ++
+    map (\_ -> allBlock WallBlock 16) [0, 1::Int]
 
     where
         bullrow = [WallBlock] ++ allBlock Empty 6
@@ -80,27 +102,27 @@ lv8' = lv8 ([0,0,0,0], [0,0])
 
 -- | Level 3 map
 lv3 :: [[Block]]
-lv3 =  changeCell (15, 5) Empty 
-    $ changeCell (15, 6) Portal lv3'
-    where
-        lv3' = [allBlock WallBlock 16] 
-            ++ map (const borders) [1..6] 
-            ++ map (const holed) [0, 1]
+lv3 = [allBlock WallBlock 16] 
+            ++ map (const borders) [1..6::Int] 
+            ++ map (const holed) [0, 1::Int]
 
 -- | Level 5
 lv5 :: [[Block]]
-lv5 = changeCell (15, 6) Portal lv5'
-    where
-    lv5' = [allBlock WallBlock 16] ++
-     map (const borders) [1..4] ++
-     map (\_ ->  WallBlock : allBlock Empty 15) [0, 1] ++
-     map (const holed) [1..4]
+lv5 = [allBlock WallBlock 16] ++
+     map (const borders) [1..4::Int] ++
+     map (\_ ->  WallBlock : allBlock Empty 15) [0, 1::Int] ++
+     map (const holed) [1..4::Int]
 
 -- | Level 7
 lv7 :: [[Block]]
-lv7 = changeCell (8, 3) (NumberedBlock 0) lv7'
-    where
-    lv7' = [allBlock WallBlock 16] ++
-        map (const borders) [1..4] ++
-        map (\_ ->  WallBlock : allBlock Empty 15) [0, 1] ++
-        map (const holed) [1..4]
+lv7 = [allBlock WallBlock 16] ++
+        map (const borders) [1..4::Int] ++
+        map (\_ ->  WallBlock : allBlock Empty 15) [0, 1::Int] ++
+        map (const holed) [1..4::Int]
+
+-- | Map for level 4
+lv4 :: [[Block]]
+lv4 =
+    [allBlock WallBlock 16] ++
+    map (const borders) [1..6::Int] ++
+    map (\_ -> allBlock WallBlock 16) [0, 1::Int]

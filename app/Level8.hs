@@ -41,7 +41,7 @@ generateWorld gen = take 4 $ randomRs (0, 9) gen
 
 -- | Game level drawing function
 drawLv8 :: State ([Int], [Int]) -> Picture
-drawLv8 (State theme grid player _ _) =
+drawLv8 (State theme grid player _ _ _) =
     pictures [background, levelmap grid, player_]
     where
         background = screenBackground theme
@@ -53,8 +53,10 @@ drawLv8 (State theme grid player _ _) =
 -- is used to change game state
 handleWorld :: Event -> State ([Int], [Int]) -> State ([Int], [Int])
 handleWorld (EventKey (MouseButton LeftButton) Down _ coord)
-    (State theme _ player (solution, usr) _) =
-        State theme grid' player state' winningState
+    state@(State theme _ player (solution, usr) _ gameState) =
+        case gameState of
+            Resumed -> State theme grid' player state' winningState gameState
+            _ -> state
         where
             cell = mouseToCell coord
             state' = (solution, changed)
@@ -77,24 +79,14 @@ handleWorld (EventKey (SpecialKey k) pos sp _) state
 -- | For every other case, world is as is
 handleWorld _ state = state
 
--- Updates player movement if required
+-- Player movement is generalized
 updateWorld :: Float -> State ([Int], [Int]) -> State ([Int], [Int])
-updateWorld _ (State theme grid player state winningState) = newState
-    where
-        newState = State theme grid' player' state winningState
-        player' = movePlayer player grid'
-        --grid = lv8 (usr, bulls)
-        grid' = if winningState then
-                changeCell (15, 6) Portal grid''
-                else grid
-        grid'' = changeCell (15, 5) Empty grid
-
+updateWorld _ = updateStates
 
 -- | Game function
--- data State = State Theme [[Block]] Player ([Int], [Int]) Bool
 game8 :: Theme -> IO()
 game8 theme = do
     gen <- newStdGen
     play window black 90
-        (State theme lv8' (200, -600, Still, ToDown 0 1) (generateWorld gen, [0,0,0,0]) False)
+        (State theme lv8' (200, -600, Still, ToDown 0 1) (generateWorld gen, [0,0,0,0]) False Resumed)
         (drawWorld drawLv8) handleWorld updateWorld

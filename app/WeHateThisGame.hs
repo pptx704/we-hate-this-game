@@ -7,7 +7,7 @@ data Block =
     | WallBlock 
     | NumberedBlock Int
     | Portal
-    deriving Show
+    deriving (Show, Eq)
 
 -- | There are two themes, dark and light
 -- Dark themes have grey foreground and white background, vice versa for light
@@ -26,4 +26,13 @@ data JumpDirection = ToUp Float Float | ToDown Float Float
 
 
 -- | Generalized game state
-data State a = State Theme [[Block]] Player a Bool
+data State a = State {
+    getTheme :: Theme, 
+    getGrid :: [[Block]], 
+    getPlayer :: Player,
+    getState :: a,
+    getPortalState :: Bool,
+    getGameState:: GameState
+}
+
+data GameState = Paused | Resumed | Over | Completed
