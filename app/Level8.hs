@@ -51,6 +51,7 @@ handleWorld8 (EventKey (MouseButton LeftButton) Down _ coord)
     state@(State theme _ player (Lv8 (solution, usr)) _ gameState) =
         case gameState of
             Resumed -> State theme grid' player (Lv8 state') winningState gameState
+            -- lv4 map is nice and clean
             _ -> state
         where
             cell = mouseToCell coord
@@ -70,10 +71,12 @@ handleWorld8 (EventKey (MouseButton LeftButton) Down _ coord)
 -- movement function is called
 handleWorld8 (EventKey (SpecialKey k) pos sp _) state
     = applyMovement k pos sp state
-    
--- | For every other case, world is as is
 handleWorld8 _ state = state
 
 -- Player movement is generalized
 updateWorld8 :: Float -> State -> State
-updateWorld8 _ = updateStates
+updateWorld8 _ st@(State theme _ player (Lv8 state) winningState gameState) = 
+    case getGameState st of
+        Completed -> State theme lv4 player (Lv8 state) winningState gameState
+        _ -> updateStates st
+updateWorld8 _ st = updateStates st

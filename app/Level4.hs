@@ -94,7 +94,7 @@ updateWorld4 _ state@(State theme grid player (Lv4 (balls, counter))
             State theme grid player (Lv4 ([], counter)) True gameState
         lost = updateStates $ 
             State theme grid player (Lv4 ([], counter)) True gameState
-updateWorld4 _ st = st
+updateWorld4 _ st = updateStates st
 
 
 -- | Handler is same as the general one

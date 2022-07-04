@@ -105,7 +105,7 @@ updateStates state@(State theme grid player stateVar winningState gameState)
     = case gameState of
         Over -> state
         Paused -> state
-        Completed -> state
+        Completed -> getNewLevel state
         _ -> State theme grid' player' stateVar winningState gs
     where
         gs = if playerOutOfScreen player' then Over else gs''

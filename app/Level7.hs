@@ -20,10 +20,10 @@ updateWorld7 :: Float -> State -> State
 updateWorld7 _ st@(State theme grid _ (Lv7 state) winningState gameState) = newState
     where
         newState = State theme grid player' (Lv7 state') winningState gameState'
-        gameState' = if state == 5 then Completed else gameState
+        gameState' = if state >= 5 then Completed else gameState
         player' = fst $ getNewState (player'', state)
         state' = snd $ getNewState (player'', state)
         player'' = getPlayer (updateStates st)
         getNewState (p, s) = if playerOutOfScreen p then ((200, -600, Still, ToDown 0 1), s+1)
             else (p, s)
-updateWorld7 _ s = s
+updateWorld7 _ s = updateStates s

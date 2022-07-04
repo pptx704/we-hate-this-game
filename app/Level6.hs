@@ -73,4 +73,4 @@ updateWorld6 t state@(State theme grid player (Lv6 stones) winningState gameStat
                 [] -> State theme grid player (Lv6 []) True gameState
                 _ -> State theme grid player newStonesLoc winningState gameState
         newStonesLoc = Lv6 $ map (decreaseStone t) stones
-updateWorld6 _ s = s
+updateWorld6 _ s = updateStates s
