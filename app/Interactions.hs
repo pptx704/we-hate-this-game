@@ -2,6 +2,8 @@ module Interactions where
 import Graphics.Gloss.Interface.Pure.Game
 import WeHateThisGame
 import Data.Fixed (div')
+import Screens
+import System.Random
 
 -- | Changes the theme
 changeTheme :: Theme -> Theme
@@ -94,11 +96,11 @@ movePlayer player grid = applyGravity (moveToSide player grid) grid
 
 -- | Checks if user reaches the portal
 reachesPortal :: Player -> Bool
-reachesPortal (x, y, _, _) = x >= 1460 && x <= 1540 
+reachesPortal (x, y, _, _) = x >= 1460 && x <= 1540
     && y <= -550  && y >= -650
 
 -- | Update the game state based on player movement and inputs
-updateStates :: State a -> State a
+updateStates :: State -> State
 updateStates state@(State theme grid player stateVar winningState gameState)
     = case gameState of
         Over -> state
@@ -112,20 +114,47 @@ updateStates state@(State theme grid player stateVar winningState gameState)
         grid' = if winningState then grid'' else grid
         grid'' = changeCell (15, 5) Empty $ changeCell (15, 6) Portal grid
 
+-- | Provides new level from the current level
+getNewLevel :: State -> State
+getNewLevel state@(State theme _ _ lv _ _) =
+    case lv of
+        Lv0 _ -> State theme lv3 (200, -600, Still, ToDown 0 1) (Lv3 ((750, -700), True)) True Resumed
+        Lv3 _ -> State theme lv4 (200, -600, Still, ToDown 0 0.1)
+            (Lv4 (map (\x -> (x * 100, -200)) $ take 3
+            $ randomRs (2, 10) gen, 0)) False Resumed
+        Lv4 _ -> State theme lv5 (200, -600, Still, ToDown 0 1) (Lv5 Empty) True Resumed
+        Lv5 _ -> State theme lv6 (200, -600, Still, ToDown 0 0)
+            (Lv6 (generateWorld generateString 700)) False Resumed
+        Lv6 _ -> State theme lv7 (200, -600, Still, ToDown 0 1) (Lv7 0) True Resumed
+        Lv7 _ -> State theme lv8' (200, -600, Still, ToDown 0 1) (Lv8 (generateWorld8, [0,0,0,0])) False Resumed
+        Lv8 _ -> state
+        where
+            gen = (mkStdGen . round) (4000 * pi::Float)
+            -- | For lv 6
+            -- Generates a list of stones from a string
+            generateWorld []       _ = []
+            generateWorld (n : ns) dx = (dx, 0, 0, n) : generateWorld ns (dx + 150)
+            -- Generates a list of chars for the stones
+            generateString = take 15 $ randomRs ('a', 'z') gen
+            -- | Generates 4 integers randomly that is the game solution
+            generateWorld8 :: [Int]
+            generateWorld8 = take 4 $ randomRs (0, 9) gen
+
 -- | Generalized function to deal with KeyPressing.
 -- Apart from movement keys, it also deals with hotkeys
 -- Modifiers shift ctrl alt
-applyMovement :: SpecialKey -> KeyState -> Modifiers -> State a -> State a
+applyMovement :: SpecialKey -> KeyState -> Modifiers -> State -> State
 applyMovement k Down (Modifiers Down _ _) state@(State theme grid player stateVar winningState gameState)
     = case k of
         KeySpace -> State (changeTheme theme) grid player stateVar winningState gameState
         KeyUp -> State theme grid player stateVar winningState Paused
         KeyDown -> State theme grid player stateVar winningState Resumed
         _ -> state
-applyMovement k pos _ state@(State theme grid player@(x, y, d, j) stateVar winningState gameState) 
+applyMovement k pos _ state@(State theme grid player@(x, y, d, j) stateVar winningState gameState)
     = case gameState of
         Over -> state
         Paused -> state
+        Completed -> getNewLevel state
         _ -> State theme grid player' stateVar winningState gameState
     where
         player' = case (k, pos) of

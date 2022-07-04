@@ -10,7 +10,7 @@ window = InWindow "We Hate This Game" (1600, 900) (10, 10)
 
 -- | Generates common world, embedds level specific world to it and then
 -- puts the drawing to topleft corner
-drawWorld :: (State a -> Picture) -> State a -> Picture
+drawWorld :: (State -> Picture) -> State -> Picture
 drawWorld drawFunc state@(State theme grid player _ _ gameState) 
     = translate (-750) 400 $
     pictures [background, levelmap grid, player', drawFunc state, message]

@@ -2,13 +2,9 @@ module Level4 where
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 import Assets
-import Screens
 import WeHateThisGame
 import Interactions
 import System.Random
-
--- | Data type to store ball position
-type Ball = (Float, Float)
 
 -- | Renders a list of ball on screen
 renderBalls :: Theme -> [Ball] -> Picture
@@ -19,11 +15,12 @@ renderBalls theme ((x, y) : ns) = ballPicture <> renderBalls theme ns
         ball = translate 0 60 (circleSolid 30)
 
 -- | Level specific items are balls
-drawLv4 :: State ([Ball], Int) -> Picture
-drawLv4 (State theme _ _ (balls, _) _ _)
+drawLv4 :: State -> Picture
+drawLv4 (State theme _ _ (Lv4 (balls, _)) _ _)
     = case balls of
     [] -> blank
     _ -> renderBalls theme balls
+drawLv4 _ = blank
 
 -- | Checks if any ball touches the ground
 ballTouchesBlock :: [Ball] -> Bool
@@ -75,8 +72,9 @@ removeBallsPlayerTouches player (n : ns) = removeTouchingBall player n
 
 -- | Update the worlds based on time passed
 -- actually not from time passed but fps
-updateWorld :: Float -> State ([Ball], Int) -> State ([Ball], Int)
-updateWorld _ state@(State theme grid player (balls, counter) winningState gameState)
+updateWorld4 :: Float -> State -> State
+updateWorld4 _ state@(State theme grid player (Lv4 (balls, counter)) 
+    winningState gameState)
     = case (ballTouchesBlock', counter >= 2900) of
     (False, True) -> won
     (True, _)     -> lost
@@ -91,21 +89,16 @@ updateWorld _ state@(State theme grid player (balls, counter) winningState gameS
         ycoord x = (fromIntegral x * 100.0, -200.0)
         moreBalls = map ycoord (generateXCoord counter (counter `mod` 300)) 
         newState' = State theme grid player 
-            (updatedBalls ++ moreBalls, counter + 1) winningState gameState
-        won = updateStates $ State theme grid player ([], counter) True gameState
-        lost = updateStates $ State theme grid player ([], counter) True gameState
+            (Lv4 (updatedBalls ++ moreBalls, counter + 1)) winningState gameState
+        won = updateStates $ 
+            State theme grid player (Lv4 ([], counter)) True gameState
+        lost = updateStates $ 
+            State theme grid player (Lv4 ([], counter)) True gameState
+updateWorld4 _ st = st
+
 
 -- | Handler is same as the general one
-handleWorld :: Event -> State ([Ball], Int) -> State ([Ball], Int)
-handleWorld (EventKey (SpecialKey k) pos sp _) state
+handleWorld4 :: Event -> State -> State
+handleWorld4 (EventKey (SpecialKey k) pos sp _) state
     = applyMovement k pos sp state
-handleWorld _ state = state
-
--- | Game function
-game4 :: Theme -> IO()
-game4 theme = do
-    gen <- newStdGen
-    play window black 70
-        (State theme lv4 (200, -600, Still, ToDown 0 0.1)
-            (map (\x -> (x * 100, -200)) $ take 3 $ randomRs (2, 10) gen, 0) False Resumed)
-        (drawWorld drawLv4) handleWorld updateWorld
+handleWorld4 _ state = state

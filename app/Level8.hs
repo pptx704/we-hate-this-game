@@ -6,7 +6,7 @@ import Assets
 import WeHateThisGame
 import System.Random
 import Graphics.Gloss.Interface.IO.Game
-import Data.List (sort, group)
+import Data.List
 
 -- | From the gamestate, determines Bulls and Cows
 -- Cows are intentionally distracting. It doesn't negate bulls
@@ -35,12 +35,8 @@ getBulls (state, usr) = [bulls, cows]
         refined = map head $ group $ sort usr
 
 
--- | Generates 4 integers randomly that is the game solution
-generateWorld :: StdGen -> [Int]
-generateWorld gen = take 4 $ randomRs (0, 9) gen
-
 -- | Game level drawing function
-drawLv8 :: State ([Int], [Int]) -> Picture
+drawLv8 :: State -> Picture
 drawLv8 (State theme grid player _ _ _) =
     pictures [background, levelmap grid, player_]
     where
@@ -51,11 +47,11 @@ drawLv8 (State theme grid player _ _ _) =
 
 -- | If the mouse button is pressed, then the mouse coordinate
 -- is used to change game state
-handleWorld :: Event -> State ([Int], [Int]) -> State ([Int], [Int])
+handleWorld :: Event -> State -> State
 handleWorld (EventKey (MouseButton LeftButton) Down _ coord)
-    state@(State theme _ player (solution, usr) _ gameState) =
+    state@(State theme _ player (Lv8 (solution, usr)) _ gameState) =
         case gameState of
-            Resumed -> State theme grid' player state' winningState gameState
+            Resumed -> State theme grid' player (Lv8 state') winningState gameState
             _ -> state
         where
             cell = mouseToCell coord
@@ -80,13 +76,5 @@ handleWorld (EventKey (SpecialKey k) pos sp _) state
 handleWorld _ state = state
 
 -- Player movement is generalized
-updateWorld :: Float -> State ([Int], [Int]) -> State ([Int], [Int])
+updateWorld :: Float -> State -> State
 updateWorld _ = updateStates
-
--- | Game function
-game8 :: Theme -> IO()
-game8 theme = do
-    gen <- newStdGen
-    play window black 90
-        (State theme lv8' (200, -600, Still, ToDown 0 1) (generateWorld gen, [0,0,0,0]) False Resumed)
-        (drawWorld drawLv8) handleWorld updateWorld

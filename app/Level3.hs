@@ -7,12 +7,9 @@ import Assets
 import WeHateThisGame
 import Graphics.Gloss.Interface.IO.Game
 
--- Balloon = Coordinated Caged? 
-type Balloon = ((Float, Float), Bool)
-
 -- | Game level drawing function
-drawLv3 :: State Balloon -> Picture
-drawLv3 (State theme grid player ((x, y), caged) _ _) =
+drawLv3 :: State -> Picture
+drawLv3 (State theme grid player (Lv3 ((x, y), caged)) _ _) =
     pictures [background, levelmap grid, player_, balloon']
     where
         background = screenBackground theme
@@ -24,42 +21,38 @@ drawLv3 (State theme grid player ((x, y), caged) _ _) =
         jumpingBlocks = jb <> translate (-200) 0 jb2 <>  translate 100 0 jb2
         jb = drawBlock theme JumpingBlock
         jb2 = jb <> translate 100 0 jb
+drawLv3 _ = blank -- blank is returned if wrong state is put here
 
 -- | If theme is changed then handle level specific mechanism
 -- otherwise continues
-handleWorld :: Event -> State Balloon -> State Balloon
-handleWorld
+handleWorld3 :: Event -> State -> State
+handleWorld3
     (EventKey (SpecialKey KeySpace) Down (Modifiers Down _ _) _)
-    (State theme grid player (coord, True) w gs)
-    = State theme' grid player (coord, newState) w gs
+    (State theme grid player (Lv3 (coord, True)) w gs)
+    = State theme' grid player (Lv3 (coord, newState)) w gs
     where
         theme' = changeTheme theme
         newState = theme /= DarkTheme
-handleWorld (EventKey (SpecialKey k) pos sp _) state
+handleWorld3 (EventKey (SpecialKey k) pos sp _) state
     = applyMovement k pos sp state
-handleWorld _ state = state
+handleWorld3 _ state = state
 
 -- | Updates the world
 -- Change balloon position, applies level specific collision
 -- then applies general updateState
-updateWorld :: Float -> State Balloon -> State Balloon
-updateWorld _ state = newState
+updateWorld3 :: Float -> State -> State
+updateWorld3 _ state = newState
     where
         newState = objectGravity $ updateStates $ balloonUp state
-        objectGravity st@(State t g (px, py, m, _) ((bx, by), c) w gs) = 
+        objectGravity st@(State t g (px, py, m, _) (Lv3 ((bx, by), c)) w gs) = 
             if px >= bx - 250 && px <= bx + 250
                 && py >= by - 305 && py <= by - 285
-                then State t g (px, py, m, ToDown 0 0.1) ((bx, by), c) w gs
+                then State t g (px, py, m, ToDown 0 0.1) (Lv3 ((bx, by), c)) w gs
                 else st
-        balloonUp (State t g p ((bx, by), False) w gs) =
-            State t g p (ballonPos'(bx, by) g, False) w gs
+        objectGravity st = st -- Wrong state will not add balloons here
+        balloonUp (State t g p (Lv3 ((bx, by), False)) w gs) =
+            State t g p (Lv3 (ballonPos'(bx, by) g, False)) w gs
         balloonUp s = s
         ballonPos' (bx, by) grid = case cellCoordToType (bx, by+49.8) grid of
             Empty -> (bx, by + 1.8)
             _ -> (bx, by)
-
--- | Game function
-game3 :: Theme -> IO()
-game3 theme = play window black 90
-        (State theme lv3 (200, -600, Still, ToDown 0 1) ((750, -700), True) True Resumed)
-        (drawWorld drawLv3) handleWorld updateWorld
