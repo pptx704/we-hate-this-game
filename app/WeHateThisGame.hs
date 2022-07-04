@@ -26,5 +26,13 @@ data JumpDirection = ToUp Float Float | ToDown Float Float
 
 
 -- | Generalized game state
-data State a = State Theme [[Block]] Player a Bool GameState
+data State a = State {
+    getTheme :: Theme, 
+    getGrid :: [[Block]], 
+    getPlayer :: Player,
+    getState :: a,
+    getPortalState :: Bool,
+    getGameState:: GameState
+}
+
 data GameState = Paused | Resumed | Over | Completed
