@@ -1,7 +1,3 @@
-# Brief Intro
-
-A logic-based puzzle game that makes the players hate the game. Lack of proper instructions and out of the box logics make the game hateable.
-
 # Introduction
 **We Hate This Game** is a logic-based puzzle game. Game is hated because of its bugs and developers' laziness disguised as features. The annoyance includes-
 
